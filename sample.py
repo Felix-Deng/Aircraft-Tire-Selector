@@ -17,7 +17,7 @@ def testing(number: int, string="") -> Optional[Union[int, str]]:
     else: 
         return None 
 
-class sample_cls: 
+class Sample_Cls: 
     """_summary_
     """
     attribute1 = 0 
