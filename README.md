@@ -12,7 +12,7 @@ Before making changes to your local code repository:
     - If your branch is behind the main branch, you may want to **rebase** your branch to the current main branch. This can be done in the "Source Control" tab of the left panel. 
 2. Make sure you are working in your local virtual environment, where you should see `(venv)` in front of the `(base)` in your terminal's command lines. If not, run the following command in terminal to activate the virtual environment: 
     - In MacOS: `source venv/bin/activate`. 
-    - In Windows: `venv\Scripts\activate`.
+    - In Windows: `source venv/Scripts/activate`.
 3. Update your local virtual environment to the new `requirements.txt`, if any changes were made from others' commits. 
     - Run the following command in terminal: `pip install -r requirements.txt`. 
 4. Now you can make your changes to the code. Meanwhile, please follow guidelines in the `dev_notes.md` file. 
@@ -30,7 +30,7 @@ After changes are pushed to your own branch, create a **pull request** (PR) with
     - In Windows, you may need to replace `python3` with `python` or `py`. 
 3. Make sure your virtual environment is activated. 
     - In MacOS, use `source venv/bin/activate`. 
-    - In Windows, use `venv\Scripts\activate`.  
+    - In Windows, use `source venv/Scripts/activate`.  
     - After successful activation, you should see `(venv)` added in front of `(base)` at the beginning of your terminal command line. 
 4. Download/upgrade all Python packages required for this code repository, as outlined in the `requirements.txt`, to your local virtual environment. 
     - Use the following command: `pip install -r requirements.txt`.  
