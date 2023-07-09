@@ -1,5 +1,5 @@
 # Aircraft-Tire-Selector
-This program automatically processed given load input and recommend aircraft tires for selection. 
+This program automatically processed given load input and maximum speed, then the program should recommend aircraft tires for selection. 
 
 ## Development guide 
 
