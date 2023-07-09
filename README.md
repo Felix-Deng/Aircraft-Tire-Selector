@@ -2,6 +2,7 @@
 This program automatically processed given load input and maximum speed, then the program should recommend aircraft tires for selection. 
 
 ## Development guide 
+Follow instructions below when developing 
 
 ### Local development 
 
