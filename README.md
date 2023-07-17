@@ -9,14 +9,16 @@ Follow instructions below when developing:
 When you try to make changes to the code repository, always start from a **branch** of the "main" branch, or other branches. A branch can be created either in GitHub or in the version control icon at the bottom left corner of your VS Code. The former one (in GitHub) is preferred, so that others can also see your progress. 
 
 Before making changes to your local code repository: 
-1. Check if your local repository is up to date. If updates are shown near the refresh icon at the bottom left corner of your VS Code, make sure to click and **pull** the new commits from the cloud. 
+1. Check if your local repository is up to date.
+    - Run `git fetch --all` in terminal to retrieve the latest updates in all branches from the remote code repository. 
+    - If updates are shown near the refresh icon at the bottom left corner of your VS Code, make sure to click and **pull** the new commits from the cloud. 
     - If your branch is behind the main branch, you may want to **rebase** your branch to the current main branch. This can be done in the "Source Control" tab of the left panel. 
-2. Make sure you are working in your local virtual environment, where you should see `(venv)` in front of the `(base)` in your terminal's command lines. If not, run the following command in terminal to activate the virtual environment: 
+3. Make sure you are working in your local virtual environment, where you should see `(venv)` in front of the `(base)` in your terminal's command lines. If not, run the following command in terminal to activate the virtual environment: 
     - In MacOS: `source venv/bin/activate`. 
     - In Windows: `source venv/Scripts/activate`.
-3. Update your local virtual environment to the new `requirements.txt`, if any changes were made from others' commits. 
+4. Update your local virtual environment to the new `requirements.txt`, if any changes were made from others' commits. 
     - Run the following command in terminal: `pip install -r requirements.txt`. 
-4. Now you can make your changes to the code. Meanwhile, please follow guidelines in the `dev_notes.md` file. 
+5. Now you can make your changes to the code. Meanwhile, please follow guidelines in the `dev_notes.md` file. 
 
 After changes are made locally and ready for upload: 
 1. Make sure all modified files are saved. 
