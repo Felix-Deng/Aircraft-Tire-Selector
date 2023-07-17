@@ -1,4 +1,5 @@
 import csv 
+import matplotlib.pyplot as plt 
 from models import Tire
 
 
@@ -10,7 +11,7 @@ with open("manufacturer_data/tire_data.csv") as data_csv:
         """Column index: [
             'Pre', 'M', 'N', 'D', 'PR', 'SI', 'Lm', 'IP', 'BL', 
             'DoMax', 'DoMin', 'WMax', 'WMin', 'DsMax', 'WsMax', 
-            'AR', 'LR_RL', 'LR_BL', 'A', 'D', 'FH', 'G', 'DF', 'QS'
+            'AR', 'LR_RL', 'LR_BL', 'A', 'RD', 'FH', 'G', 'DF', 'QS'
         ]
         """
         # With every row of data, create a new Tire object to 
@@ -26,3 +27,10 @@ with open("manufacturer_data/eval_results.csv", "w") as out_csv:
     csv_writer = csv.writer(out_csv)
     ##### Write your code below #####
     csv_writer.writerow([])
+    
+# Show a distribution plot of the percentage errors between 
+# calculation results and manufacturer data 
+plt.hist() 
+plt.tight_layout() 
+plt.show() 
+# plt.savefig("eval_results.png")

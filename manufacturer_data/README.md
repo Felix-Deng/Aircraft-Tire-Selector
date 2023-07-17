@@ -11,7 +11,7 @@ Specifically, we focused on bias type VII, presented with the three part (inch c
 | | Nominal Section Width | | N |
 | | Rim Diameter | | D |
 | | Ply Rating | | PR |
-| | Speed Index | mph | SI |
+| | Speed Index | mph (or knot if otherwise specified with "kt") | SI |
 | Application Rating | Max. Loading | lbs | Lm |
 | | Inflation Pressure (Unloaded) | psi | IP |
 | | Approx. Bottoming Load | lbs | BL |
@@ -25,7 +25,7 @@ Specifically, we focused on bias type VII, presented with the three part (inch c
 | Static Loaded Radius | At Rated Load | inches | LR_RL|
 | | At Bottoming Load | inches | LR_BL |
 | Rim Description | Width Between Flanges | inches | A |
-| | Specified Rim Diameter | inches | D |
+| | Specified Rim Diameter | inches | RD |
 | | Flange Height ($F_H$) | inches | FH |
 | | Min. Ledge Width | inches | G |
 | | Outer Flange Diameter ($D_F$) | inches | DF |
