@@ -50,12 +50,11 @@ class Tire:
         # Qualification Standard
         self.QS: str = kwargs.get('QS', '')
         
-        #Check for D value
-        if self.D == 0:
+        # Check for D value
+        if not self.D:
             self.D = self.RD
-
-        #lift ratio
-        self.Lr = self.Dm/self.D
+        
+        self.Lr = self.Dm/self.D # lift ratio
 
     def max_load_capacity(self, exact=False) -> float: 
         """
@@ -124,6 +123,7 @@ class Tire:
                 + 6.3261135
             )
         else:
+            # raise ValueError("Lr value is outside the defined range.")
             if self.Lr <= 1.5:
                 return 1.475 - 0.331 * self.Lr
             else:
@@ -135,7 +135,6 @@ class Tire:
                     - 7.4168297 * 5 \
                     + 6.3261135
                 )
-            #raise ValueError("Lr value is outside the defined range.")
     
     def load_supporting_capability(self) -> float:
         """
