@@ -1,5 +1,6 @@
 import re
 import csv 
+import numpy as np 
 import matplotlib.pyplot as plt 
 import matplotlib.ticker as mtick 
 
@@ -12,10 +13,15 @@ from models import Tire
 # Retrieve given tire data 
 with open("manufacturer_data/tire_data.csv") as data_csv: 
     csv_reader = csv.reader(data_csv)
-    next(csv_reader)  # skip header row
-    calc_result = [['Databook Lm', 'Rounded Calc Lm', 'Exact Calc Lm', 'Rounded Lm Relative Difference', 'Comment']] 
-    for row in csv_reader: 
-        """Column index: [
+    # next(csv_reader)  # skip header row
+    calc_result = [] 
+    for i, row in enumerate(csv_reader): 
+        if i == 0: 
+            calc_result.append(
+                row + ['Rounded Calc Lm', 'Exact Calc Lm', 'Rounded Lm Relative Difference', 'Comment']
+            )
+            continue 
+        """ Column index: [
             'Pre', 'M', 'N', 'D', 'PR', 'SI', 'Lm', 'IP', 'BL', 
             'DoMax', 'DoMin', 'WMax', 'WMin', 'DsMax', 'WsMax', 
             'AR', 'LR_RL', 'LR_BL', 'A', 'RD', 'FH', 'G', 'DF', 'QS'
@@ -47,10 +53,9 @@ with open("manufacturer_data/tire_data.csv") as data_csv:
                 comment = 'Lr = {}, Lm to be comfirmed'.format(tire.Lr)
             else:
                 comment = ''
-            calc_result.append([databook_Lm, rounded_Lm, exact_Lm, diff_ratio, comment])
+            calc_result.append(row + [rounded_Lm, exact_Lm, diff_ratio, comment])
         else:
-            calc_result.append([float_dim[5], 0, 0, 'N/A', 'No enough info'])
-
+            calc_result.append(row + [0, 0, 'N/A', 'No enough info'])
 
 # Save the calculated Lm to a new CSV to compare with given manufacturer values 
 with open("manufacturer_data/eval_results.csv", "w") as out_csv: 
@@ -58,8 +63,10 @@ with open("manufacturer_data/eval_results.csv", "w") as out_csv:
     csv_writer.writerows(calc_result)
     
 # Show a distribution plot of the percentage errors between calculation results and manufacturer data
-difference = [row[3] for row in calc_result[1:]]
+difference = [row[-2] for row in calc_result[1:]]
 difference = [element * 100 for element in difference if isinstance(element, float)]
+print("Mean Error: {}%".format(round(np.mean(difference), 2)))
+print("Mean Non-zero Error: {}%".format(round(np.mean([d for d in difference if d > 0]), 2)))
 # difference = [element * 100 for element in difference if isinstance(element, float) and element <= 0.55] # zoom 
 fig, ax = plt.subplots(1, 1)
 ax.hist(difference)

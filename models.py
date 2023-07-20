@@ -65,13 +65,15 @@ class Tire:
             float: maximum loading capacity of the tire in lbs; 
                    returned value rounded to the nearest 25 pounds if not exact. 
         """
-        Lm = self.ground_contact_area() * (self.pressure_index() + self.load_supporting_capability()) 
+        Lm = self.ground_contact_area() * (
+            self.pressure_index() + self.load_supporting_capability()
+        ) 
         if exact: 
             return Lm 
         else: 
             return round(Lm / 25) * 25 
     
-    def ground_contact_area(self, b=0.32) -> float:
+    def ground_contact_area(self) -> float:
         """
         Args:
             b (float, optional): fractional tire deflection. 
@@ -80,19 +82,21 @@ class Tire:
         Returns:
             float: ground contact area of the tire (Ad)
         """
+        if self.Pre == "B" or self.Pre == "H": # or self.SI <= 160: 
+            b = 0.35
+        else: 
+            b = 0.32 
         d = b * (self.Dm - self.DF)/2  # actual deflection of the tire 
         return 0.77 * math.pi * d * math.sqrt((self.Dm - d) * (self.Wm - d))
     
-    def pressure_index(self, T0=4.4) -> float:
+    def pressure_index(self) -> float:
         """
-        Args:
-            T0 (float, optional): 4 for type III tires; defaults to 4.4 for others.
-
         Returns:
             float: pressure index of the tire (P)
         """
         Re = self.ratio_of_ends_per_inch()
         Ne = self.PR - 0.4
+        T0 = 4.4  # 4 for type III tires, 4.4 otherwise
         a = (self.Dm - self.D)/4
         Q = 2.5 + self.D / (2 * self.Dm)
         S = a * Q
@@ -143,8 +147,8 @@ class Tire:
                    in units of equivalent pressure (Pc)
         """
         # assume the mean cross section == mean tire width 
-        if self.Dm < 5.5:
-            return self.N
+        if self.Wm < 5.5:
+            return self.PR
         else:
             return (10.4 * self.PR ** 2) / self.Wm ** 2
 
