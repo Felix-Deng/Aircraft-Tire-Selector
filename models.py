@@ -50,9 +50,11 @@ class Tire:
         # Qualification Standard
         self.QS: str = kwargs.get('QS', '')
         
-        # Check for D value
+        # Check for missing values 
         if not self.D:
             self.D = self.RD
+        if not self.DF: 
+            self.DF = self.D + 2 * self.FH
         
         self.Lr = self.Dm/self.D # lift ratio
 
@@ -65,9 +67,15 @@ class Tire:
             float: maximum loading capacity of the tire in lbs; 
                    returned value rounded to the nearest 25 pounds if not exact. 
         """
+        # if self.Pre == "B" or self.Pre == "H" or self.SI <= 160: 
+        #     Lm = (0.35 + 0.45) * self.ground_contact_area() * (
+        #         self.pressure_index() + self.load_supporting_capability()
+        #     )
+        # else: 
         Lm = self.ground_contact_area() * (
             self.pressure_index() + self.load_supporting_capability()
         ) 
+        
         if exact: 
             return Lm 
         else: 

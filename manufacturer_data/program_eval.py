@@ -39,7 +39,7 @@ with open("manufacturer_data/tire_data.csv") as data_csv:
         # With every row of data, create a new Tire object to calculate maximum load capacity (Lm) 
         if (float_dim[5] != 0) and (float_dim[8] != 0) and (float_dim[9] != 0):
             tire = Tire(
-                Pre=row[0], M=float_dim[0], N=float_dim[1], D=float_dim[2], PR=float_dim[3], SI=float_dim[4], 
+                Pre=row[0].strip(), M=float_dim[0], N=float_dim[1], D=float_dim[2], PR=float_dim[3], SI=float_dim[4], 
                 Lm=float_dim[5], IP=float_dim[6], BL=float_dim[7], DoMax=float_dim[8], DoMin=float_dim[9], WMax=float_dim[10], 
                 WMin=float_dim[11], DsMax=float_dim[12], WsMax=float_dim[13], AR=float_dim[14], LR_RL=float_dim[15], LR_BL=float_dim[16], 
                 A=float_dim[17], RD=float_dim[18], FH=float_dim[19], G=float_dim[20], DF=float_dim[21], QS=row[-1]
