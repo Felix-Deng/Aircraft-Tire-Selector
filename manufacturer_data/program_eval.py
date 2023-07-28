@@ -18,7 +18,11 @@ with open("manufacturer_data/tire_data.csv") as data_csv:
     for i, row in enumerate(csv_reader): 
         if i == 0: 
             calc_result.append(
-                row + ['Rounded Calc Lm', 'Exact Calc Lm', 'Rounded Lm Relative Difference', 'Comment']
+                row + [
+                    'Rounded Calc Lm', 'Exact Calc Lm', 
+                    'Rounded Lm Relative Difference', 
+                    'Absolute Relative Difference', 'Comment'
+                ]
             )
             continue 
         """ Column index: [
@@ -48,14 +52,15 @@ with open("manufacturer_data/tire_data.csv") as data_csv:
             databook_Lm = tire.Lm
             rounded_Lm = tire.max_load_capacity()
             exact_Lm = round(tire.max_load_capacity(exact=True), 2)
-            diff_ratio = round(abs(databook_Lm - rounded_Lm) / databook_Lm, 2)
+            diff_ratio = round((rounded_Lm - databook_Lm) / databook_Lm, 2)
+            abs_diff_ratio = abs(diff_ratio)
             if (tire.Lr <= 1.5)|(tire.Lr >= 5):
                 comment = 'Lr = {}, Lm to be comfirmed'.format(tire.Lr)
             else:
                 comment = ''
-            calc_result.append(row + [rounded_Lm, exact_Lm, diff_ratio, comment])
+            calc_result.append(row + [rounded_Lm, exact_Lm, diff_ratio, abs_diff_ratio, comment])
         else:
-            calc_result.append(row + [0, 0, 'N/A', 'No enough info'])
+            calc_result.append(row + [0, 0, 'N/A', 'N/A', 'No enough info'])
 
 # Save the calculated Lm to a new CSV to compare with given manufacturer values 
 with open("manufacturer_data/eval_results.csv", "w") as out_csv: 
@@ -63,13 +68,20 @@ with open("manufacturer_data/eval_results.csv", "w") as out_csv:
     csv_writer.writerows(calc_result)
     
 # Show a distribution plot of the percentage errors between calculation results and manufacturer data
-difference = [row[-2] for row in calc_result[1:]]
-difference = [element * 100 for element in difference if isinstance(element, float)]
-print("Mean Error: {}%".format(round(np.mean(difference), 2)))
-print("Mean Non-zero Error: {}%".format(round(np.mean([d for d in difference if d > 0]), 2)))
-# difference = [element * 100 for element in difference if isinstance(element, float) and element <= 0.55] # zoom 
+diff = [row[-3] for row in calc_result[1:]]
+diff = [element * 100 for element in diff if isinstance(element, float)]
+print("Non-absolute difference:")
+print("Mean Error: {}%".format(round(np.mean(diff), 2)))
+print("Mean Non-zero Error: {}%".format(round(np.mean([d for d in diff if d > 0]), 2)))
+
+abs_diff = [row[-2] for row in calc_result[1:]]
+abs_diff = [element * 100 for element in abs_diff if isinstance(element, float)]
+print("\nAbsolute difference:")
+print("Mean Error: {}%".format(round(np.mean(abs_diff), 2)))
+print("Mean Non-zero Error: {}%".format(round(np.mean([d for d in abs_diff if d > 0]), 2)))
+
 fig, ax = plt.subplots(1, 1)
-ax.hist(difference)
+ax.hist(diff)
 ax.set_xlabel('Relative Error of Calculation Results')
 ax.set_ylabel('Number of Calculations')
 ax.xaxis.set_major_formatter(mtick.PercentFormatter())

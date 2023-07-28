@@ -67,21 +67,15 @@ class Tire:
             float: maximum loading capacity of the tire in lbs; 
                    returned value rounded to the nearest 25 pounds if not exact. 
         """
-        # if self.Pre == "B" or self.Pre == "H" or self.SI <= 160: 
-        #     Lm = (0.35 + 0.45) * self.ground_contact_area() * (
-        #         self.pressure_index() + self.load_supporting_capability()
-        #     )
-        # else: 
         Lm = self.ground_contact_area() * (
             self.pressure_index() + self.load_supporting_capability()
         ) 
-        
         if exact: 
             return Lm 
         else: 
             return round(Lm / 25) * 25 
     
-    def ground_contact_area(self) -> float:
+    def ground_contact_area(self, b=0.32) -> float:
         """
         Args:
             b (float, optional): fractional tire deflection. 
@@ -90,10 +84,6 @@ class Tire:
         Returns:
             float: ground contact area of the tire (Ad)
         """
-        if self.Pre == "B" or self.Pre == "H": # or self.SI <= 160: 
-            b = 0.35
-        else: 
-            b = 0.32 
         d = b * (self.Dm - self.DF)/2  # actual deflection of the tire 
         return 0.77 * math.pi * d * math.sqrt((self.Dm - d) * (self.Wm - d))
     

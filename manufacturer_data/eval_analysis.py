@@ -18,7 +18,7 @@ results = model.fit()
 print(results.summary())
 
 # Sort by scale of error 
-sorted_df = df.sort_values(by=["Rounded Lm Relative Difference"], ascending=False)
+sorted_df = df.sort_values(by=["Absolute Relative Difference"], ascending=False)
 sorted_df.to_csv("manufacturer_data/sorted_eval.csv")
 
 # Plot relationship between individual parameter 
