@@ -5,6 +5,8 @@ This program automatically processed given load input and maximum speed, then th
 ```
 - main.py
 - models.py: the Tire class that stores parameters and defines functions of a typical aircraft tire 
+- optimizer.py: optimize tire dimensions given load requirements using openMDAO 
+- selector.py: select optimal tire given load requirements from manufacturer data
 - /manufacturer_data: testing and validation with manufacturer's public data
   |-- program_eval.py: calculate difference between calculated and provided values 
   |-- eval_analysis.py: analysis of the evaluating results from program_eval.py 

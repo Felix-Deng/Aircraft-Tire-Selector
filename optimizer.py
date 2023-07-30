@@ -70,7 +70,10 @@ if __name__ == "__main__":
     prob.model.add_design_var('PR', lower=4, upper=38)
     prob.model.add_objective("mass")
     prob.model.add_constraint('con1', lower=0.01)
-    prob.model.add_constraint('Lm', lower=10000) # add required Lm here 
+    
+    # Define required minimum Lm here 
+    required_Lm = 10000 
+    prob.model.add_constraint('Lm', lower=required_Lm) 
     
     prob.model.approx_totals() 
     
@@ -88,9 +91,11 @@ if __name__ == "__main__":
     print("D: ", D)
     print("DF: ", DF)
     print("PR: ", PR)
+    print()
     
     tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
-    print("Load Capacity:", tire.max_load_capacity(exact=True))
-    print("Gas Mass (model):", tire.inflation_medium_mass())
-    print('Gas Mass (MDA):', prob.get_val('mass')[0])
+    print("Required load capacity:", required_Lm, "lbs")
+    print("Load capacity of optimized tire:", tire.max_load_capacity(exact=True), "lbs")
+    print("Gas Mass (model):", tire.inflation_medium_mass(), "kg")
+    print('Gas Mass (MDA):', prob.get_val('mass')[0], "kg")
     
