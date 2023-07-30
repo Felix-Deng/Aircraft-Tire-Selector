@@ -100,11 +100,11 @@ class Tire:
         Q = 2.5 + self.D / (2 * self.Dm)
         S = a * Q
         F0 = (
-            (-1.623104 * 10**(-7) * self.D**5) \
-            + (1.463062 * 10**(-5) * self.D**4) \
-            - (5.607522 * 10**(-4) * self.D**3) \
-            + (0.01288401 * self.D**2) \
-            - (0.197904 * self.D) \
+            -1.623104e-7 * self.D**5 \
+            + 1.463062e-5 * self.D**4 \
+            - 5.607522e-4 * self.D**3 \
+            + 0.01288401 * self.D**2 \
+            - 0.197904 * self.D \
             + 2.567982
         )
         return (40 * Re * T0 * Ne) / (S * F0)
@@ -155,11 +155,11 @@ class Tire:
         """
         Args:
             P_gas (float, optional): tire gas inflation pressure in psi. 
-                Defaults to 0.0 to calculate using given tire dimension.
+                Defaults to 0.0 to calculate using equations.
             P_amb (float, optional): ambient pressure in psi. 
                 Defaults to standard atmospheric pressure 14.7 psi (101325 Pa).
             T (float, optional): absolute temperature in Kelvin. 
-                Defaults to 298.15 K (25 degree celsius).
+                Defaults to 298.15 K (25 degree celsius) for standard ambient temperature.
             M_gas (float, optional): molar mass of the inflation gas in g/mol. 
                 Defaults to 28.0134 g/mol for nitrogen. 
                 For air, M_gas = 29 g/mol. 
@@ -183,9 +183,11 @@ class Tire:
         Returns:
             float: indicator inflation pressure of the tire in psi. 
         """
-        if self.Pre == "B" or self.Pre == "H" or self.SI <= 160: # 35% tire deflection 
+        Pc = self.load_supporting_capability() 
+        
+        if self.Pre == "B" or self.Pre == "H" or (self.SI and self.SI <= 160): # 35% tire deflection 
             b = 0.35 
-            P = self.max_load_capacity() / (b + 0.45) / self.ground_contact_area(b=b) - self.load_supporting_capability() 
+            P = self.max_load_capacity() / (b + 0.45) / self.ground_contact_area(b=b) - Pc
         else: # 32% tire deflection 
             P = self.pressure_index() 
         
@@ -194,7 +196,7 @@ class Tire:
         else: 
             X = 0.01 * P - 0.5 
         
-        return P + X * self.load_supporting_capability() + 3 
+        return P + X * Pc + 3 
 
 
 if __name__ == "__main__": 
