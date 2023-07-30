@@ -1,6 +1,7 @@
 import re
 import csv 
 import numpy as np 
+from scipy import constants 
 import matplotlib.pyplot as plt 
 import matplotlib.ticker as mtick 
 
@@ -35,7 +36,7 @@ with open("manufacturer_data/tire_data.csv") as data_csv:
         float_dim = ['0' if x == '' else x for x in row[1:-1]] # Replace empty elements with '0'
         if 'kt' in float_dim[4].lower(): # Check SI (could be in kt or mph or LS)
             float_dim[4] = re.sub('[A-Za-z ]+', '', float_dim[4]) # format can be 195kt, 195 kt , 195 Kt ,
-            float_dim[4] = float(float_dim[4].split()[0]) * 1.151 # 1 Knot = 1.151 mph
+            float_dim[4] = float(float_dim[4].split()[0]) * constants.knot / constants.mph
         elif 'ls' in float_dim[4].lower(): # Using 1 to represent LS 
             float_dim[4] = '1'
         float_dim = [float(dim) for dim in float_dim] # Convert All elements to floats

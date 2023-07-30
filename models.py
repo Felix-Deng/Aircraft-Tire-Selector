@@ -1,4 +1,5 @@
 import math
+from scipy import constants 
 
 class Tire: 
     """ This class stores all the specification of a tire along with common 
@@ -64,7 +65,7 @@ class Tire:
             exact (bool, optional): should the exact load be returned? Defaults to False.
 
         Returns:
-            float: maximum loading capacity of the tire in lbs; 
+            float: maximum loading capacity of the tire (Lm) in lbs; 
                    returned value rounded to the nearest 25 pounds if not exact. 
         """
         Lm = self.ground_contact_area() * (
@@ -82,10 +83,10 @@ class Tire:
                                  Defaults to 0.32 for type VII tires.
 
         Returns:
-            float: ground contact area of the tire (Ad)
+            float: ground contact area of the tire (Ad) in inch^2 
         """
         d = b * (self.Dm - self.DF)/2  # actual deflection of the tire 
-        return 0.77 * math.pi * d * math.sqrt((self.Dm - d) * (self.Wm - d))
+        return 0.77 * constants.pi * d * math.sqrt((self.Dm - d) * (self.Wm - d))
     
     def pressure_index(self) -> float:
         """
@@ -149,6 +150,51 @@ class Tire:
             return self.PR
         else:
             return (10.4 * self.PR ** 2) / self.Wm ** 2
+        
+    def inflation_medium_mass(self, P_gas=0.0, P_amb=14.7, T=298.15, M_gas=28.0134) -> float: 
+        """
+        Args:
+            P_gas (float, optional): tire gas inflation pressure in psi. 
+                Defaults to 0.0 to calculate using given tire dimension.
+            P_amb (float, optional): ambient pressure in psi. 
+                Defaults to standard atmospheric pressure 14.7 psi (101325 Pa).
+            T (float, optional): absolute temperature in Kelvin. 
+                Defaults to 298.15 K (25 degree celsius).
+            M_gas (float, optional): molar mass of the inflation gas in g/mol. 
+                Defaults to 28.0134 g/mol for nitrogen. 
+                For air, M_gas = 29 g/mol. 
+
+        Returns:
+            float: mass of the inflation medium (gas) of the tire (m) in kg 
+        """
+        # Pressure 
+        if not P_gas: 
+            P_gas = self.inflation_pressure() 
+        P_abs = (P_gas + P_amb) * constants.psi 
+        
+        # Volume 
+        H = (self.Dm - self.D) / 2 # section height 
+        V = constants.pi**2 * self.Wm * H * (self.D + H) / 4 * constants.inch**3
+        
+        return P_abs * V * M_gas / constants.R / T / 1000 
+    
+    def inflation_pressure(self) -> float: 
+        """
+        Returns:
+            float: indicator inflation pressure of the tire in psi. 
+        """
+        if self.Pre == "B" or self.Pre == "H" or self.SI <= 160: # 35% tire deflection 
+            b = 0.35 
+            P = self.max_load_capacity() / (b + 0.45) / self.ground_contact_area(b=b) - self.load_supporting_capability() 
+        else: # 32% tire deflection 
+            P = self.pressure_index() 
+        
+        if P > 100: 
+            X = 0.5 
+        else: 
+            X = 0.01 * P - 0.5 
+        
+        return P + X * self.load_supporting_capability() + 3 
 
 
 if __name__ == "__main__": 
@@ -159,7 +205,14 @@ if __name__ == "__main__":
         FH=1, G=1.4, DF=12, QS='TSO-C62'
     )
     print(
-        f'From Databook: {tire.Lm}\n'\
-        + f'From Calculation (rounded): {tire.max_load_capacity()}\n'\
-        + f'From calculation (exact): {round(tire.max_load_capacity(exact=True), 2)}'
+        'Maximum load capacity of the tire:\n'\
+        + f'From databook: {tire.Lm} lbs\n'\
+        + f'From calculation (rounded): {tire.max_load_capacity()} lbs\n'\
+        + f'From calculation (exact): {round(tire.max_load_capacity(exact=True), 2)} lbs\n'\
+        + '\nInflation pressure of the tire:\n'\
+        + f'From databook: {tire.IP} psi\n'\
+        + f'From calculation: {round(tire.inflation_pressure(), 2)} psi\n'\
+        + '\nMass of tire\'s inflation medium:\n'\
+        + f'With databook pressure: {round(tire.inflation_medium_mass(), 2)} kg\n'\
+        + f'With calculated pressure: {round(tire.inflation_medium_mass(P_gas=tire.IP), 2)} kg'
     )

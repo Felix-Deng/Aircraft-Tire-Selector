@@ -1,6 +1,15 @@
 # Aircraft-Tire-Selector
 This program automatically processed given load input and maximum speed, then the program should recommend aircraft tires for selection. 
 
+## Structure of this repository 
+```
+- main.py
+- models.py: the Tire class that stores parameters and defines functions of a typical aircraft tire 
+- /manufacturer_data: testing and validation with manufacturer's public data
+  |-- program_eval.py: calculate difference between calculated and provided values 
+  |-- eval_analysis.py: analysis of the evaluating results from program_eval.py 
+```
+
 ## Development guide 
 Follow instructions below when developing: 
 
