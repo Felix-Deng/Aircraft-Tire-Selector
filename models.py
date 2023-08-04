@@ -1,4 +1,4 @@
-import math
+import numpy as np 
 from scipy import constants 
 
 class Tire: 
@@ -66,7 +66,7 @@ class Tire:
 
         Returns:
             float: maximum loading capacity of the tire (Lm) in lbs; 
-                   returned value rounded to the nearest 25 pounds if not exact. 
+                returned value rounded to the nearest 25 pounds if not exact. 
         """
         Lm = self.ground_contact_area() * (
             self.pressure_index() + self.load_supporting_capability()
@@ -74,19 +74,19 @@ class Tire:
         if exact: 
             return Lm 
         else: 
-            return round(Lm / 25) * 25 
+            return np.round(Lm / 25) * 25 
     
     def ground_contact_area(self, b=0.32) -> float:
         """
         Args:
             b (float, optional): fractional tire deflection. 
-                                 Defaults to 0.32 for type VII tires.
+                Defaults to 0.32 for type VII tires.
 
         Returns:
             float: ground contact area of the tire (Ad) in inch^2 
         """
         d = b * (self.Dm - self.DF)/2  # actual deflection of the tire 
-        return 0.77 * constants.pi * d * math.sqrt((self.Dm - d) * (self.Wm - d))
+        return 0.77 * constants.pi * d * np.sqrt((self.Dm - d) * (self.Wm - d))
     
     def pressure_index(self) -> float:
         """
@@ -143,7 +143,7 @@ class Tire:
         """
         Returns:
             float: load supporting capability of the tire carcass 
-                   in units of equivalent pressure (Pc)
+                in units of equivalent pressure (Pc)
         """
         # assume the mean cross section == mean tire width 
         if self.Wm < 5.5:

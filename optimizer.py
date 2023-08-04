@@ -1,7 +1,12 @@
+import numpy as np 
 import openmdao.api as om
+import matplotlib.pyplot as plt 
 from models import Tire
 
 class LoadCapacity(om.ExplicitComponent): 
+    """The explicit MDA component that defines the discipline 
+    (correlation of all optimizing variables) for optimization. 
+    """
     def setup(self): 
         self.add_input('Dm', val=30)
         self.add_input('Wm', val=10)
@@ -23,7 +28,11 @@ class LoadCapacity(om.ExplicitComponent):
         tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
         outputs['Lm'] = tire.max_load_capacity(exact=True)
 
+
 class GasMass(om.ExplicitComponent): 
+    """The explicite MDA component that defines the objective 
+    for optimization. 
+    """
     def setup(self): 
         self.add_input('Dm', val=30)
         self.add_input('Wm', val=10)
@@ -45,41 +54,108 @@ class GasMass(om.ExplicitComponent):
         tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
         outputs['mass'] = tire.inflation_medium_mass()
         
-if __name__ == "__main__": 
-    prob = om.Problem() 
-    prob.model.add_subsystem(
-        'load', LoadCapacity(), promotes_inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], 
-        promotes_outputs=['Lm']
-    )
-    prob.model.nonlinear_solver = om.NonlinearBlockGS() 
-    prob.model.add_subsystem(
-        'obj', GasMass(), promotes_inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], 
-        promotes_outputs=['mass']
-    )
-    prob.model.add_subsystem(
-        'con_cmp1', om.ExecComp('con1 = mass'), promotes=['con1', 'mass']
-    )
+
+class TireMDA(om.Group): 
+    """The MDA group that connects all disciplines, 
+    objectives, and constraints for optimization. 
+    """
+    def setup(self):
+        cycle = self.add_subsystem('cycle', om.Group())
+        cycle.add_subsystem('d', LoadCapacity())
+        
+        cycle.nonlinear_solver = om.NonlinearBlockGS() 
+        cycle.linear_solver = om.ScipyKrylov()
+        
+        self.add_subsystem('obj_cmp', GasMass())
+        
+        self.add_subsystem(
+            'con_cmp1', om.ExecComp('con1 = mass')
+        )
+        self.add_subsystem(
+            'con_cmp2', om.ExecComp('con2 = Dm - DF', Dm=30, DF=15)
+        )
+        self.add_subsystem(
+            'con_cmp3', om.ExecComp('con3 = DF - D', DF=15, D=15)
+        )
+        self.add_subsystem(
+            'con_cmp4', om.ExecComp(
+                'con4 = (DF - D) / 2 / (Dm - D)', DF=15, D=15, Dm=30
+            )
+        )
+        
+    def configure(self):
+        self.cycle.promotes('d', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['Lm'])
+        self.promotes('cycle', any=['*'])
+        
+        self.promotes('obj_cmp', any=['Dm', 'Wm', 'D', 'DF', 'PR', 'mass'])
+        self.promotes('con_cmp1', any=['con1', 'mass'])
+        self.promotes('con_cmp2', any=['con2', 'Dm', 'DF'])
+        self.promotes('con_cmp3', any=['con3', 'DF', 'D'])
+        self.promotes('con_cmp4', any=['con4', 'DF', 'D', 'Dm'])
+        
+        self.add_design_var('Dm', lower=12, upper=57)
+        self.add_design_var('Wm', lower=4, upper=21)
+        self.add_design_var('D', lower=4, upper=28)
+        self.add_design_var('DF', lower=5.1, upper=33)
+        self.add_design_var('PR', lower=4, upper=38)
+        
+        self.add_objective("mass")
+        self.add_constraint('con1', lower=0.0001)
+        self.add_constraint('con2', lower=0.0001)
+        self.add_constraint('con3', lower=0.0001)
+        self.add_constraint('con4', lower=0.03548, upper=0.1875)
+
+def optimize_tire(req_Lm: float, reports=True) -> om.Problem: 
+    """This function sets up the MDA problem for openMDAO 
+
+    Args:
+        req_Lm (float): the minimum required load capacity 
+        reports (bool): should reports be auto generated? 
+            Defaults to True
+
+    Returns:
+        om.Problem: the optimized MDA problem with results 
+    """
+    prob = om.Problem(reports=reports) 
+    prob.model = TireMDA()
     
-    prob.driver = om.ScipyOptimizeDriver() 
-    prob.driver.options['optimizer'] = 'SLSQP'
+    prob.driver = om.ScipyOptimizeDriver(optimizer='SLSQP') 
     
-    prob.model.add_design_var('Dm', lower=12, upper=57)
-    prob.model.add_design_var('Wm', lower=4, upper=21)
-    prob.model.add_design_var('D', lower=4, upper=28)
-    prob.model.add_design_var('DF', lower=5.1, upper=33)
-    prob.model.add_design_var('PR', lower=4, upper=38)
-    prob.model.add_objective("mass")
-    prob.model.add_constraint('con1', lower=0.01)
-    
-    # Define required minimum Lm here 
-    required_Lm = 10000 
-    prob.model.add_constraint('Lm', lower=required_Lm) 
+    prob.model.add_constraint('Lm', lower=req_Lm) 
     
     prob.model.approx_totals() 
     
     prob.setup() 
     prob.set_solver_print(level=0)
     prob.run_driver() 
+    
+    return prob 
+
+
+if __name__ == "__main__": 
+    # """
+    req = np.arange(1000, 76001, 5000) # testing range 
+    opt = [] 
+    for Lm in req: 
+        prob = optimize_tire(Lm, reports=False)
+        Dm = prob.get_val('Dm')[0]
+        Wm = prob.get_val('Wm')[0]
+        D = prob.get_val('D')[0]
+        DF = prob.get_val('DF')[0]
+        PR = prob.get_val('PR')[0]
+        tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
+        opt.append(tire.max_load_capacity(exact=False))
+
+    plt.scatter(req, opt)
+    plt.plot(req, req)
+    plt.xlabel("Required Lm")
+    plt.ylabel("Optimized Lm")
+    plt.tight_layout() 
+    plt.show() 
+    # """
+    """
+    required_Lm = 36000 
+    prob = optimize_tire(required_Lm)
     
     Dm = prob.get_val('Dm')[0]
     Wm = prob.get_val('Wm')[0]
@@ -98,4 +174,5 @@ if __name__ == "__main__":
     print("Load capacity of optimized tire:", tire.max_load_capacity(exact=True), "lbs")
     print("Gas Mass (model):", tire.inflation_medium_mass(), "kg")
     print('Gas Mass (MDA):', prob.get_val('mass')[0], "kg")
+    # """
     
