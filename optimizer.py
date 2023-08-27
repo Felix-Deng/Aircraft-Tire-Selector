@@ -1,4 +1,6 @@
+from typing import Tuple
 import numpy as np 
+from scipy.stats import linregress
 import openmdao.api as om
 import matplotlib.pyplot as plt 
 from models import Tire
@@ -105,57 +107,92 @@ class TireMDA(om.Group):
         self.add_constraint('con3', lower=0.0001)
         self.add_constraint('con4', lower=0.03548, upper=0.1875)
 
-def optimize_tire(req_Lm: float, reports=True) -> om.Problem: 
+def optimize_tire(req_Lm: float, reports=True, res_level=0) -> Tuple[om.Problem, bool]: 
     """This function sets up the MDA problem for openMDAO 
 
     Args:
         req_Lm (float): the minimum required load capacity 
-        reports (bool): should reports be auto generated? 
-            Defaults to True
+        reports (bool, optional): should reports be auto generated? 
+            Defaults to True. 
+        res_level (int, optional): the level of detail should the 
+            solver results be printed. Defaults to 0. 
 
     Returns:
-        om.Problem: the optimized MDA problem with results 
+        Tuple[om.Problem, bool]: [
+            the optimized MDA problem with results, 
+            if the optimization was successful 
+        ]
     """
     prob = om.Problem(reports=reports) 
     prob.model = TireMDA()
-    
     prob.driver = om.ScipyOptimizeDriver(optimizer='SLSQP') 
     
     prob.model.add_constraint('Lm', lower=req_Lm) 
-    
     prob.model.approx_totals() 
     
     prob.setup() 
-    prob.set_solver_print(level=0)
-    prob.run_driver() 
+    prob.set_solver_print(level=res_level)
+    fail_fag = prob.run_driver() 
     
-    return prob 
+    return prob, not fail_fag
 
+def eval_optimizer(
+    num=30, range_l=1000, range_u=76001, show_plot=False, num_summary=True
+) -> float:
+    """Test the performance (load capacity of the tires) of the optimization 
+    setup by comparing the expected performance to the performance of the 
+    optimized model. 
 
-if __name__ == "__main__": 
-    # """
-    req = np.arange(1000, 76001, 5000) # testing range 
-    opt = [] 
-    for Lm in req: 
-        prob = optimize_tire(Lm, reports=False)
-        Dm = prob.get_val('Dm')[0]
-        Wm = prob.get_val('Wm')[0]
-        D = prob.get_val('D')[0]
-        DF = prob.get_val('DF')[0]
-        PR = prob.get_val('PR')[0]
-        tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
-        opt.append(tire.max_load_capacity(exact=False))
+    Args:
+        num (int, optional): number of data points to be tested. Defaults to 30.
+        range_u (int, optional): upper bound of the testing range of the required 
+            load capacity. Defaults to 1000.
+        range_l (int, optional): lower bound of the testing range of the required 
+            load capacity. Defaults to 76001.
+        show_plot (bool, optional): show the comparison plot. Defaults to False.
+        num_summary (bool, optional): print out a summary of number of models optimized. 
+            Defaults to True. 
 
-    plt.scatter(req, opt)
-    plt.plot(req, req)
-    plt.xlabel("Required Lm")
-    plt.ylabel("Optimized Lm")
-    plt.tight_layout() 
-    plt.show() 
-    # """
+    Returns:
+        float: the standard error of the linear regression fitted for the comparison. 
     """
+    expected = np.arange(range_l, range_u, (range_u - range_l) // num)
+    evaluated = [] # keep track of values of successful optimizations 
+    optimized = [] 
+    
+    for Lm in expected: 
+        prob, succ = optimize_tire(Lm, reports=False, res_level=-1)
+        if succ: 
+            Dm = prob.get_val('Dm')[0]
+            Wm = prob.get_val('Wm')[0]
+            D = prob.get_val('D')[0]
+            DF = prob.get_val('DF')[0]
+            PR = prob.get_val('PR')[0]
+            tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
+            
+            evaluated.append(Lm)
+            optimized.append(tire.max_load_capacity(exact=False))
+    
+    if show_plot: 
+        plt.scatter(evaluated, optimized)
+        plt.plot(expected, expected, ls='--')
+        plt.xlabel("Required Lm")
+        plt.ylabel("Optimized Lm")
+        plt.tight_layout() 
+        plt.show() 
+    
+    print(f'''{'*' * 30}
+Number of models optimized: 
+    Total: {len(expected)}
+    successful: {len(optimized)}
+    Success rate: {len(optimized) / len(expected)}
+{'*' * 30}''')
+    return linregress(evaluated, optimized).stderr
+     
+
+if __name__ == "__main__":     
     required_Lm = 36000 
-    prob = optimize_tire(required_Lm)
+    prob, succ = optimize_tire(required_Lm, reports=False)
     
     Dm = prob.get_val('Dm')[0]
     Wm = prob.get_val('Wm')[0]
@@ -174,5 +211,6 @@ if __name__ == "__main__":
     print("Load capacity of optimized tire:", tire.max_load_capacity(exact=True), "lbs")
     print("Gas Mass (model):", tire.inflation_medium_mass(), "kg")
     print('Gas Mass (MDA):', prob.get_val('mass')[0], "kg")
-    # """
+    
+    # print(eval_optimizer(show_plot=True))
     
