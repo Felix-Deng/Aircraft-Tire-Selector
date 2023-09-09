@@ -81,9 +81,10 @@ class TireMDA(om.Group):
         )
         self.add_subsystem(
             'con_cmp4', om.ExecComp(
-                'con4 = (DF - D) / 2 / (Dm - D)', DF=15, D=15, Dm=30
+                'con4 = (Dm - D) / 2 / Wm', Dm=30, D=15, Wm=10
             )
-        )
+        ) # aspect ratio 
+        
         
     def configure(self):
         self.cycle.promotes('d', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['Lm'])
@@ -93,7 +94,7 @@ class TireMDA(om.Group):
         self.promotes('con_cmp1', any=['con1', 'mass'])
         self.promotes('con_cmp2', any=['con2', 'Dm', 'DF'])
         self.promotes('con_cmp3', any=['con3', 'DF', 'D'])
-        self.promotes('con_cmp4', any=['con4', 'DF', 'D', 'Dm'])
+        self.promotes('con_cmp4', any=['con4', 'Dm', 'D', 'Wm'])
         
         self.add_design_var('Dm', lower=12, upper=57)
         self.add_design_var('Wm', lower=4, upper=21)
@@ -105,7 +106,7 @@ class TireMDA(om.Group):
         self.add_constraint('con1', lower=0.0001)
         self.add_constraint('con2', lower=0.0001)
         self.add_constraint('con3', lower=0.0001)
-        self.add_constraint('con4', lower=0.03548, upper=0.1875)
+        self.add_constraint('con4', lower=0.25, upper=1.0) # TRA standard
 
 def optimize_tire(req_Lm: float, reports=True, res_level=0) -> Tuple[om.Problem, bool]: 
     """This function sets up the MDA problem for openMDAO 
@@ -161,17 +162,21 @@ def eval_optimizer(
     optimized = [] 
     
     for Lm in expected: 
-        prob, succ = optimize_tire(Lm, reports=False, res_level=-1)
-        if succ: 
-            Dm = prob.get_val('Dm')[0]
-            Wm = prob.get_val('Wm')[0]
-            D = prob.get_val('D')[0]
-            DF = prob.get_val('DF')[0]
-            PR = prob.get_val('PR')[0]
-            tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
-            
-            evaluated.append(Lm)
-            optimized.append(tire.max_load_capacity(exact=False))
+        Lm -= 1
+        succ = False 
+        while not succ: 
+            Lm += 1
+            prob, succ = optimize_tire(Lm, reports=False, res_level=-1)
+    
+        Dm = prob.get_val('Dm')[0]
+        Wm = prob.get_val('Wm')[0]
+        D = prob.get_val('D')[0]
+        DF = prob.get_val('DF')[0]
+        PR = prob.get_val('PR')[0]
+        tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
+        
+        evaluated.append(Lm)
+        optimized.append(tire.max_load_capacity(exact=False))
     
     if show_plot: 
         plt.scatter(evaluated, optimized)
@@ -181,14 +186,16 @@ def eval_optimizer(
         plt.tight_layout() 
         plt.show() 
     
-    print(f'''{'*' * 30}
+    if num_summary: 
+        print(f'''{'*' * 30}
 Number of models optimized: 
     Total: {len(expected)}
     successful: {len(optimized)}
     Success rate: {len(optimized) / len(expected)}
 {'*' * 30}''')
+    
     return linregress(evaluated, optimized).stderr
-     
+    
 
 if __name__ == "__main__":     
     required_Lm = 36000 
@@ -212,5 +219,5 @@ if __name__ == "__main__":
     print("Gas Mass (model):", tire.inflation_medium_mass(), "kg")
     print('Gas Mass (MDA):', prob.get_val('mass')[0], "kg")
     
-    # print(eval_optimizer(show_plot=True))
+    # print("Standard Error between required and optimized Lm:", eval_optimizer(show_plot=True))
     
