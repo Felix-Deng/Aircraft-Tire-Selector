@@ -1,30 +1,20 @@
-from pyxdsm.XDSM import XDSM, OPT, SOLVER, FUNC, LEFT 
+from pyxdsm.XDSM import XDSM, OPT, SOLVER, FUNC, LEFT
 
 x = XDSM(use_sfmath=True)
 
 x.add_system("opt", OPT, r"\text{Optimizer}")
-x.add_system("solver", SOLVER, r"\text{Newton}")
-x.add_system("D1", FUNC, "D_1")
-x.add_system("D2", FUNC, "D_2")
-x.add_system("F", FUNC, "F")
-x.add_system("G", FUNC, "G")
+x.add_system("geo", FUNC, r"\text{Geometry}")
+x.add_system("mech", FUNC, r"\text{Mechanical Feasibility}")
 
-x.connect("opt", "D1", "x, z")
-x.connect("opt", "D2", "z")
-x.connect("opt", "F", "x, z")
-x.connect("solver", "D1", "y_2")
-x.connect("solver", "D2", "y_1")
-x.connect("D1", "solver", r"\mathcal{R}(y_1)")
-x.connect("solver", "F", "y_1, y_2")
-x.connect("D2", "solver", r"\mathcal{R}(y_2)")
-x.connect("solver", "G", "y_1, y_2")
+x.connect("opt", "geo", "x")
+x.connect("geo", "mech", "x")
 
-x.connect("F", "opt", "f")
-x.connect("G", "opt", "g")
+# x.connect("geo", "opt", "x^*")
+x.connect("mech", "opt", "x^*")
 
-x.add_output("opt", "x^*, z^*", side=LEFT)
-x.add_output("D1", "y_1^*", side=LEFT)
-x.add_output("D2", "y_2^*", side=LEFT)
-x.add_output("F", "f^*", side=LEFT)
-x.add_output("G", "g^*", side=LEFT)
+x.add_input("opt", "x^{(0)}")
+x.add_output("opt", "x^*", side=LEFT)
+x.add_output("geo", "L_m", side=LEFT)
+# x.add_output("mech", "\sigma_{fibre}", side=LEFT)
+
 x.write("mdf", outdir="./XDSM")
