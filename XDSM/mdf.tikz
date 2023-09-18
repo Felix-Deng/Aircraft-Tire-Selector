@@ -22,26 +22,52 @@
 \node [DataIO] (output_opt) {$x^{(0)}$};&
 &
 &
+&
+\node [DataIO] (output_mech) {$I_{speed}$};&
 \\
 %Row 1
 \node [DataIO] (left_output_opt) {$x^*$};&
 \node [Optimization] (opt) {$\text{Optimizer}$};&
-\node [DataInter] (opt-geo) {$x$};&
+\node [DataInter] (opt-solver) {$x$};&
+&
+&
 &
 \\
 %Row 2
-\node [DataIO] (left_output_geo) {$L_m$};&
 &
-\node [Function] (geo) {$\text{Geometry}$};&
-\node [DataInter] (geo-mech) {$x$};&
+&
+\node [MDA] (solver) {$\text{Geometry}$};&
+\node [DataInter] (solver-load) {$x$};&
+\node [DataInter] (solver-mass) {$x$};&
+\node [DataInter] (solver-mech) {$x$};&
 \\
 %Row 3
 &
-\node [DataInter] (mech-opt) {$x^*$};&
+\node [DataInter] (load-opt) {$L_m$};&
+&
+\node [Function] (load) {$L_m(x)$};&
+&
+&
+\\
+%Row 4
+&
+\node [DataInter] (mass-opt) {$m_{tire}$};&
+&
+&
+\node [Function] (mass) {$m_{tire}(x)$};&
+&
+\\
+%Row 5
+&
+\node [DataInter] (mech-opt) {$\sigma_{cord}$};&
+&
+&
 &
 \node [Function] (mech) {$\text{Mechanical Feasibility}$};&
 \\
-%Row 4
+%Row 6
+&
+&
 &
 &
 &
@@ -55,16 +81,24 @@
 \begin{pgfonlayer}{data}
 \path
 % Horizontal edges
-(opt) edge [DataLine] (opt-geo)
-(geo) edge [DataLine] (geo-mech)
+(opt) edge [DataLine] (opt-solver)
+(solver) edge [DataLine] (solver-load)
+(solver) edge [DataLine] (solver-mass)
+(solver) edge [DataLine] (solver-mech)
+(load) edge [DataLine] (load-opt)
+(mass) edge [DataLine] (mass-opt)
 (mech) edge [DataLine] (mech-opt)
 (opt) edge [DataLine] (left_output_opt)
-(geo) edge [DataLine] (left_output_geo)
 % Vertical edges
-(opt-geo) edge [DataLine] (geo)
-(geo-mech) edge [DataLine] (mech)
+(opt-solver) edge [DataLine] (solver)
+(solver-load) edge [DataLine] (load)
+(solver-mass) edge [DataLine] (mass)
+(solver-mech) edge [DataLine] (mech)
+(load-opt) edge [DataLine] (opt)
+(mass-opt) edge [DataLine] (opt)
 (mech-opt) edge [DataLine] (opt)
-(opt) edge [DataLine] (output_opt);
+(opt) edge [DataLine] (output_opt)
+(mech) edge [DataLine] (output_mech);
 \end{pgfonlayer}
 
 \end{tikzpicture}
