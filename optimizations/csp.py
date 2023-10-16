@@ -1,3 +1,10 @@
+"""
+The constrain satisfaction program (CSP) defines the entire discrete design space 
+with variable domain and constraints. Generating all design options that satisfy 
+all constraints gives the full design space for filtering and searching the optimal 
+design option(s). 
+"""
+
 import csv 
 import numpy as np 
 import time 

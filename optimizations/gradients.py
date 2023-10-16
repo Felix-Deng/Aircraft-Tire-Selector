@@ -1,3 +1,14 @@
+"""
+The gradients-based optimization method utilizes structural multidisciplinary 
+design optimization (MDO) framework to optimize the continuous design space. 
+Specifically, the openMDAO framework [1], developed by NASA, is utilized in this script. 
+
+[1] Gray, J. S., Hwang, J. T., Martins, J. R. R. A., Moore, K. T., & Naylor, B. A. (2019). 
+    OpenMDAO: an open-source framework for multidisciplinary design, analysis, and optimization. 
+    Structural and Multidisciplinary Optimization, 59(4), 1075–1104. 
+    https://doi.org/10.1007/s00158-019-02211-z
+"""
+
 from typing import Tuple
 import numpy as np 
 from scipy.stats import linregress

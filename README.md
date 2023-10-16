@@ -5,11 +5,21 @@ This program automatically processed given load input and maximum speed, then th
 ```
 - main.py
 - models.py: the Tire class that stores parameters and defines functions of a typical aircraft tire 
-- optimizer.py: optimize tire dimensions given load requirements using openMDAO 
 - selector.py: select optimal tire given load requirements from manufacturer data
 - /manufacturer_data: testing and validation with manufacturer's public data
+  |-- _methods.py: import models.py from root directory 
   |-- program_eval.py: calculate difference between calculated and provided values 
   |-- eval_analysis.py: analysis of the evaluating results from program_eval.py 
+- /optimizations: store all alternative optimization methods used 
+  |-- _models.py: import models.py from root directory 
+  |-- bayesOps.py: Bayesian optimization method 
+  |-- csp.py: method for solving constraint satisfaction problems 
+  |-- gradients.py: method utilizing the openMDAO framework 
+  |-- randSearch.py: random search method 
+- /xDSM: the extended design structure matrix (xDSM) for the MDO problem 
+  |-- xdsm_plotter.py: code used to generate the xDSM plot 
+  |-- mdf.pdf: plotted xDSM plot in PDF 
+  |-- mdf.tex: plotted xDSM plot for LaTeX 
 ```
 
 ## Development guide 
