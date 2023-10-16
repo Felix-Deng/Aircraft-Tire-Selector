@@ -3,9 +3,6 @@ import numpy as np
 from scipy import constants 
 import re
 
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from models import Tire
 
 def find_tiredim(Lm):

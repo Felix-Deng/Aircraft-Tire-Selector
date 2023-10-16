@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import linregress
 import openmdao.api as om
 import matplotlib.pyplot as plt 
-from models import Tire
+from _models import Tire
 
 class LoadCapacity(om.ExplicitComponent): 
     """The explicit MDA component that defines the discipline 
