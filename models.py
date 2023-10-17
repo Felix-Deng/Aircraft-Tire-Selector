@@ -27,10 +27,10 @@ class Tire:
         # Inflated Tire Dimensions (inches)
         self.DoMax: float = kwargs.get('DoMax', 0)
         self.DoMin: float = kwargs.get('DoMin', 0)
-        self.Dm = (self.DoMax + self.DoMin) / 2     # mean tire diameter 
+        self.Dm: float = kwargs.get("Dm", (self.DoMax + self.DoMin) / 2) # mean tire diameter 
         self.WMax: float = kwargs.get('WMax', 0)
         self.WMin: float = kwargs.get('WMin', 0)
-        self.Wm = (self.WMax + self.WMin) / 2       # mean overall tire width 
+        self.Wm: float = kwargs.get("Wm", (self.WMax + self.WMin) / 2) # mean overall tire width 
         self.DsMax: float = kwargs.get('DsMax', 0)
         self.WsMax: float = kwargs.get('WsMax', 0)
         

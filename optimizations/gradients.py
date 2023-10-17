@@ -38,7 +38,7 @@ class LoadCapacity(om.ExplicitComponent):
         DF = inputs['DF']
         PR = inputs['PR']
         
-        tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
+        tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
         outputs['Lm'] = tire.max_load_capacity(exact=True)
 
 
@@ -64,7 +64,7 @@ class GasMass(om.ExplicitComponent):
         DF = inputs['DF']
         PR = inputs['PR']
         
-        tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
+        tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
         outputs['mass'] = tire.inflation_medium_mass()
         
 
@@ -184,7 +184,7 @@ def eval_optimizer(
         D = prob.get_val('D')[0]
         DF = prob.get_val('DF')[0]
         PR = prob.get_val('PR')[0]
-        tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
+        tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
         
         evaluated.append(Lm)
         optimized.append(tire.max_load_capacity(exact=False))
@@ -224,11 +224,11 @@ if __name__ == "__main__":
     print("PR: ", PR)
     print()
     
-    tire = Tire(PR=PR, DoMax=Dm, DoMin=Dm, WMax=Wm, WMin=Wm, RD=D, DF=DF)
+    tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
     print("Required load capacity:", required_Lm, "lbs")
     print("Load capacity of optimized tire:", tire.max_load_capacity(exact=True), "lbs")
     print("Gas Mass (model):", tire.inflation_medium_mass(), "kg")
-    print('Gas Mass (MDA):', prob.get_val('mass')[0], "kg")
+    print('Gas Mass (MDO):', prob.get_val('mass')[0], "kg")
     
     # print("Standard Error between required and optimized Lm:", eval_optimizer(show_plot=True))
     
