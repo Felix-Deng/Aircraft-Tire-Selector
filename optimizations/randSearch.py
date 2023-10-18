@@ -97,7 +97,7 @@ def rs_discrete(
             temp_dim = [] 
             valid_move = True 
             for ind, var in enumerate(design_var): 
-                scope_ind = np.where(scope[var] == curr_best_dim[i])[0]
+                scope_ind = np.where(scope[var] == curr_best_dim[ind])[0][0]
                 move_ind = scope_ind + move[ind] * step_size
                 # Check if the new move is going out of the variable's scope 
                 if 0 <= move_ind < len(scope[var]): 
@@ -128,7 +128,7 @@ def rs_discrete(
     
     
 if __name__ == "__main__": 
-    np.random.seed(80)
+    # np.random.seed(80)
     # Define generation range 
     RANGE_Dm = np.arange(12, 56, 0.5)
     RANGE_Wm = np.concatenate((np.arange(4, 10, 0.25), np.arange(10, 21, 0.5)))
@@ -151,3 +151,4 @@ if __name__ == "__main__":
     print("DF: ", tire.DF)
     print("PR: ", tire.PR)
     print("Lm: ", tire.max_load_capacity())
+    print("Mass_tire: ", tire.inflation_medium_mass())
