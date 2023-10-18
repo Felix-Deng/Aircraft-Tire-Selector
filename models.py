@@ -1,3 +1,5 @@
+import inspect
+from typing import List
 import numpy as np 
 from scipy import constants 
 
@@ -58,6 +60,31 @@ class Tire:
             self.DF = self.D + 2 * self.FH
         
         self.Lr = self.Dm/self.D # lift ratio
+        
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Tire): 
+            attr_self = [
+                a[1] for a in inspect.getmembers(self) 
+                if not a[0].startswith("__") and not inspect.ismethod(a[1])
+            ]
+            attr_other = [
+                a[1] for a in inspect.getmembers(other) 
+                if not a[0].startswith("__") and not inspect.ismethod(a[1])
+            ]
+            for i, item in enumerate(attr_self): 
+                if not item == attr_other[i]: 
+                    return False 
+            return True 
+        else: 
+            return False 
+        
+    def get_key_dim(self) -> List[float]: 
+        """Return the key dimensions of the tire 
+
+        Returns:
+            List[float]: ['PR', 'Dm', 'Wm', 'D', 'DF'] 
+        """
+        return [self.PR, self.Dm, self.Wm, self.D, self.DF] 
 
     def max_load_capacity(self, exact=False) -> float: 
         """
@@ -206,6 +233,7 @@ if __name__ == "__main__":
         WMax=7.20, WMin=6.80, DsMax=19.25, WsMax=6.35, AR=0.78, LR_RL=9, LR_BL=6.8, A=5.50, RD=10,
         FH=1, G=1.4, DF=12, QS='TSO-C62'
     )
+    tire = Tire(PR=28, Dm=43, Wm=16, D=20, DF=23.5)
     print(
         'Maximum load capacity of the tire:\n'\
         + f'From databook: {tire.Lm} lbs\n'\
