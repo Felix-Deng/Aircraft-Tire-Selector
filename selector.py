@@ -1,49 +1,59 @@
+import re
 import csv
+import copy 
+from typing import Optional
+
 import numpy as np 
 from scipy import constants 
-import re
 
 from models import Tire
 
-def find_tiredim(Lm):
-    """Given the desired loading capacity, find the corresponding tire specifications from Michelin Tire Databook, 
-    and arrange them from lowest mass to highest mass
+def search_databook(Lm_des: float, speed_index_des=0.0) -> Optional[Tire]:
+    """Given the desired loading capacity, find the corresponding tire specifications 
+    from the Michelin Tire Databook. 
 
     Args:
-        Lm (float): The required loading capacity
+        Lm_des (float): required tire loading capability in lbs. 
+        speed_index_des (float, optional): designed speed rating for the aircraft in mph. Defaults to 0.0.
+
+    Returns:
+        Optional[Tire]: recommended lightest tire based on manufacturer databook. 
     """
-    tire_list = [['Dm', 'Wm', 'D','DF','PR','Gas mass']]
+    best_tire = None 
+    lowest_mass = float('inf') 
+    
     with open("manufacturer_data/tire_data.csv") as data_csv: 
         csv_reader = csv.reader(data_csv)
         next(csv_reader)  # skip header row
-        for i, row in enumerate(csv_reader):
+        
+        for row in csv_reader:
             # Data clean up 
-            float_dim = ['0' if x == '' else x for x in row[1:-1]] # Replace empty elements with '0'
-            if 'kt' in float_dim[4].lower(): # Check SI (could be in kt or mph or LS)
-                float_dim[4] = re.sub('[A-Za-z ]+', '', float_dim[4]) # format can be 195kt, 195 kt , 195 Kt ,
-                float_dim[4] = float(float_dim[4].split()[0]) * constants.knot / constants.mph
-            elif 'ls' in float_dim[4].lower(): # Using 1 to represent LS 
-                float_dim[4] = '1'
-            float_dim = [float(dim) for dim in float_dim] # Convert All elements to floats
-        
-            # With every row of data, create a new Tire object to calculate maximum load capacity (Lm) 
-            if (float_dim[5] != 0) and (float_dim[8] != 0) and (float_dim[9] != 0):
-                tire = Tire(
-                    Pre=row[0].strip(), M=float_dim[0], N=float_dim[1], D=float_dim[2], PR=float_dim[3], SI=float_dim[4], 
-                    Lm=float_dim[5], IP=float_dim[6], BL=float_dim[7], DoMax=float_dim[8], DoMin=float_dim[9], WMax=float_dim[10], 
-                    WMin=float_dim[11], DsMax=float_dim[12], WsMax=float_dim[13], AR=float_dim[14], LR_RL=float_dim[15], LR_BL=float_dim[16], 
-                    A=float_dim[17], RD=float_dim[18], FH=float_dim[19], G=float_dim[20], DF=float_dim[21], QS=row[-1]
-                )
-        
-                databook_Lm = tire.Lm
-                gass_mass = tire.inflation_medium_mass()
-                #rounded_Lm = tire.max_load_capacity()
-                #exact_Lm = round(tire.max_load_capacity(exact=True), 2)
-                #diff_ratio = round((rounded_Lm - databook_Lm) / databook_Lm, 2)
-                #abs_diff_ratio = abs(diff_ratio)
-                if float(Lm) == databook_Lm: #find the column meet the requirement
-                    tire_list.append([tire.Dm, tire.Wm, tire.D, tire.DF, tire.PR, gass_mass])
-    return tire_list
+            manu_dim = ['0' if x == '' else x for x in row[1:-1]] # replace empty elements with '0'
+            if 'kt' in manu_dim[4].lower(): # convert kt to mph 
+                manu_dim[4] = float(re.sub('[A-Za-z ]+', '', manu_dim[4]).split()[0]) * constants.knot / constants.mph
+            elif 'ls' in manu_dim[4].lower(): # assign 1 mph for LS ratings 
+                manu_dim[4] = '1'
+            manu_dim = [float(dim) for dim in manu_dim] # convert all elements to floats
 
-tire_list = find_tiredim(3000)
-print(tire_list)
+            # Check fitness for consideration 
+            if (
+                (manu_dim[5] and manu_dim[9]) and # required design parameters present 
+                manu_dim[5] >= Lm_des and # check if Lm meet requirement 
+                (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) # check if speed index meet requirement (if any)
+            ):
+                tire = Tire(
+                    D=manu_dim[2], PR=manu_dim[3], SI=manu_dim[4], Lm=manu_dim[5], 
+                    DoMax=manu_dim[8], DoMin=manu_dim[9], WMax=manu_dim[10], 
+                    WMin=manu_dim[11], RD=manu_dim[18], FH=manu_dim[19], DF=manu_dim[21]
+                )
+                curr_mass = tire.inflation_medium_mass()
+                # Check if better than current best 
+                if curr_mass < lowest_mass: 
+                    lowest_mass = curr_mass 
+                    best_tire = copy.deepcopy(tire) 
+    
+    if not best_tire: 
+        print("No suitable tire design options can be found from the manufacturer databook.")
+    return best_tire
+
+print(search_databook(30000))

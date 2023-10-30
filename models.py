@@ -61,6 +61,21 @@ class Tire:
         
         self.Lr = self.Dm/self.D # lift ratio
         
+    def __str__(self) -> str:
+        return f'''{'*'*20}
+Tire Design Parameters:
+- Dm: {self.Dm} in
+- Wm: {self.Wm} in
+- D: {self.D} in
+- DF: {self.DF} in
+- PR: {self.PR} in
+Tire Performance: 
+- Lm (databook): {self.Lm} lbs
+- Lm (analytical): {round(self.max_load_capacity(exact=True), 4)} lbs
+- Mass: {round(self.inflation_medium_mass(), 4)} kg
+- Speed Index: {self.SI} mph
+{'*'*20}'''
+    
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Tire): 
             attr_self = [
