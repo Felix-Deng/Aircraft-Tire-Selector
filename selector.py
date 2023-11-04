@@ -56,4 +56,5 @@ def search_databook(Lm_des: float, speed_index_des=0.0) -> Optional[Tire]:
         print("No suitable tire design options can be found from the manufacturer databook.")
     return best_tire
 
-print(search_databook(30000))
+if __name__ == "__main__": 
+    print(search_databook(30000))
