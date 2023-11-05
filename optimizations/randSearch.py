@@ -37,7 +37,7 @@ def is_geo_valid(dim: List[float], req_Lm: float) -> Union[Tire, bool]:
     return tire 
 
 def rs_discrete(
-    req_Lm: float, scope: Dict[str, np.ndarray], step_size: int, 
+    req_Lm: float, speed_index: float, scope: Dict[str, np.ndarray], step_size: int, 
     iter=10000, runtime=15*60, fitness=1e-6, init_dim=[] 
 ) -> Optional[Tire]: 
     """Use random search (RS) to search for an optimized tire design 
@@ -45,6 +45,7 @@ def rs_discrete(
 
     Args:
         req_Lm (float): minimum required loading capability 
+        speed_index (float): the speed index of the target aircraft design 
         scope (Dict[str, np.ndarray]): the domain of all design variables 
             Dict[name_of_variable, array_of_all_available_values]
         step_size (int): radius of the hypersphere, in number of array index 
@@ -127,7 +128,7 @@ def rs_discrete(
     return curr_best_tire 
     
 def rs_continuous(
-    req_Lm: float, scope: Dict[str, Tuple[float, float]], step_size: float, 
+    req_Lm: float, speed_index: float, scope: Dict[str, Tuple[float, float]], step_size: float, 
     iter=10000, runtime=15*60, fitness=1e-6, init_dim=[] 
 ) -> Optional[Tire]: 
     """Use random search (RS) to search for an optimized tire design 
@@ -135,6 +136,7 @@ def rs_continuous(
 
     Args:
         req_Lm (float): minimum required loading capability 
+        speed_index (float): the speed index of the target aircraft design 
         scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         step_size (float): radius of the hypersphere, in float step increment
@@ -227,7 +229,7 @@ if __name__ == "__main__":
         "DF": np.arange(5, 33, 0.25), 
         "PR": np.arange(4, 38, 1)
     }
-    tire = rs_discrete(36000, scope, 1, runtime=10 * 60)
+    tire = rs_discrete(36000, 0, scope, 1, runtime=10 * 60)
     # tire = rs_discrete(36000, scope, 1, runtime=10 * 60, init_dim=[28, 43, 16, 20, 23.5])
     print("Dm: ", tire.Dm)
     print("Wm: ", tire.Wm)
@@ -245,7 +247,7 @@ if __name__ == "__main__":
         "DF": (5, 33), 
         "PR": (4, 38)
     }
-    tire = rs_continuous(36000, scope, 1, runtime=10 * 60)
+    tire = rs_continuous(36000, 0, scope, 1, runtime=10 * 60)
     # tire = rs_continuous(36000, scope, 1, runtime=10 * 60, init_dim=[28, 43, 16, 20, 23.5])
     print("Dm: ", tire.Dm)
     print("Wm: ", tire.Wm)
