@@ -17,10 +17,9 @@ import matplotlib.pyplot as plt
 from _models import Tire
 
 
-def gradients_opt(
+def _gradients_opt(
     req_Lm: float, speed_index: float, scope: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', linear_solver=om.ScipyKrylov(), nonlinear_solver=om.NonlinearBlockGS(), 
-    reports=False
+    optimizer: str='SLSQP', reports=False
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scope and solver types. 
@@ -31,8 +30,6 @@ def gradients_opt(
         scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
-        linear_solver (_type_, optional): _description_. Defaults to om.ScipyKrylov().
-        nonlinear_solver (_type_, optional): _description_. Defaults to om.NonlinearBlockGS().
         reports (bool, optional): should reports be auto generated? Defaults to False.
 
     Returns:
@@ -101,8 +98,8 @@ def gradients_opt(
             cycle = self.add_subsystem('cycle', om.Group())
             cycle.add_subsystem('d', LoadCapacity())
             
-            cycle.nonlinear_solver = nonlinear_solver
-            cycle.linear_solver = linear_solver
+            cycle.nonlinear_solver = om.NonlinearBlockGS()
+            cycle.linear_solver = om.ScipyKrylov()
             
             self.add_subsystem('obj_cmp', GasMass())
             
@@ -168,6 +165,35 @@ def gradients_opt(
     )
     return tire 
 
+def gradients_opt(
+    req_Lm: float, speed_index: float, scope: Dict[str, Tuple[float, float]], 
+    optimizer: str='SLSQP', reports=False
+) -> Tire: 
+    """Use the openMDAO framework to perform gradients-based optimization to search 
+    for an optimized aircraft tire design given scope and solver types. 
+
+    Args:
+        req_Lm (float): the minimum required load capacity 
+        speed_index (float): the speed index of the target aircraft design 
+        scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
+            Dict[name_of_variable, Tuple[min_value, max_value]]
+        optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
+        reports (bool, optional): should reports be auto generated? Defaults to False.
+
+    Returns:
+        Tire: the optimized tire design 
+    """
+    tire = None 
+    counter = 0 
+    while not tire: 
+        counter += 1
+        if counter > 1: 
+            print("openMDAO optimization failed to return a valid tire design. Starting attempt number {} ...".format(counter))
+        tire = _gradients_opt(req_Lm, speed_index, scope, optimizer, reports)
+        req_Lm += 1
+    return tire 
+        
+    
 def eval_gradients_opt(
     scope: Dict[str, Tuple[float, float]], 
     num=30, range_l=1000, range_u=76001, show_plot=False, num_summary=True
@@ -196,11 +222,7 @@ def eval_gradients_opt(
     optimized = [] 
     
     for Lm in expected: 
-        Lm -= 1
-        tire = None 
-        while not tire: 
-            Lm += 1
-            tire = gradients_opt(Lm, 0, scope)
+        tire = gradients_opt(Lm, 0, scope)
         evaluated.append(Lm)
         optimized.append(tire.max_load_capacity(exact=False))
     
@@ -231,7 +253,8 @@ if __name__ == "__main__":
         "DF": (5, 33), 
         "PR": (4, 38)
     }
-    tire = gradients_opt(36000, 0, scope)
+    # tire = gradients_opt(36000, 0, scope)
+    tire = gradients_opt(61000, 0, scope)
     print(tire)
     
     # print(

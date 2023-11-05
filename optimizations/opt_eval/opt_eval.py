@@ -1,3 +1,4 @@
+# %% 
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -7,6 +8,7 @@ from bayesOps import bayes_opt
 from gradients import gradients_opt
 from selector import search_databook 
 
+import time 
 import numpy as np 
 import matplotlib.pyplot as plt 
 
@@ -24,7 +26,7 @@ scope_disc = {
     "DF": np.arange(5, 33, 0.25), 
     "PR": np.arange(4, 38, 1)
 }
-Lm_testing_range = np.arange(1000, 76000, 1000)
+Lm_testing_range = np.arange(1000, 76000, 10000)
 
 # Optimization results: List[Tuple[Lm, mass]]
 res_rs_disc = [] 
@@ -32,25 +34,33 @@ res_rs_cont = []
 res_bayes = [] 
 res_gradients = [] 
 
-for req_Lm in Lm_testing_range: 
-    # TODO: Add error handling 
+start_time = time.time()
+for i, req_Lm in enumerate(Lm_testing_range): 
+    enum_time = time.time() 
+    
     tire = rs_discrete(req_Lm, 0, scope_disc, 1)
-    res_rs_disc.append((tire.max_load_capacity(), tire.inflation_medium_mass()))
+    res_rs_disc.append((tire.max_load_capacity(exact=True), tire.inflation_medium_mass()))
     
     tire = rs_continuous(req_Lm, 0, scope_cont, 1)
-    res_rs_cont.append((tire.max_load_capacity(), tire.inflation_medium_mass()))
+    res_rs_cont.append((tire.max_load_capacity(exact=True), tire.inflation_medium_mass()))
     
     tire = bayes_opt(
-        req_Lm, 0, scope_cont, n_iter=200, util_kind='ucb', util_kappa=8, 
+        req_Lm, 0, scope_cont, init_points=10, n_iter=100, util_kind='ucb', util_kappa=8, 
         util_kappa_decay=0.95, util_kappa_decay_delay=50
     )
-    res_bayes.append((tire.max_load_capacity(), tire.inflation_medium_mass()))
+    res_bayes.append((tire.max_load_capacity(exact=True), tire.inflation_medium_mass()))
     
     tire = gradients_opt(req_Lm, 0, scope_cont)
-    res_gradients.append((tire.max_load_capacity(), tire.inflation_medium_mass()))
+    res_gradients.append((tire.max_load_capacity(exact=True), tire.inflation_medium_mass()))
     
-# Plot req_Lm vs. opt_Lm 
+    print("{}\nAnalysis {}/{} completed \t req_Lm = {}\nLm Elapsed Time: {} s \t Total Elapsed Time: {} s\n{}".format(
+        "*"*50, i+1, len(Lm_testing_range), round(req_Lm, 2), 
+        round(time.time() - enum_time, 2), round(time.time() - start_time, 2), "*"*50
+    ))
+
+# %% Plot req_Lm vs. opt_Lm 
 fig, ax = plt.subplots()
+ax.plot(Lm_testing_range, Lm_testing_range, '--', label='Reference')
 ax.scatter(Lm_testing_range, [res[0] for res in res_rs_disc], label='Random Search (Discrete)')
 ax.scatter(Lm_testing_range, [res[0] for res in res_rs_cont], label='Random Search (Continuous)')
 ax.scatter(Lm_testing_range, [res[0] for res in res_bayes], label='Bayesian Optimization')
@@ -61,7 +71,7 @@ ax.set_ylabel("Optimized Lm (lbs)")
 plt.tight_layout() 
 plt.show() 
 
-# Plot req_Lm vs. opt_mass 
+# %% Plot req_Lm vs. opt_mass 
 fig, ax = plt.subplots()
 ax.scatter(Lm_testing_range, [res[1] for res in res_rs_disc], label='Random Search (Discrete)')
 ax.scatter(Lm_testing_range, [res[1] for res in res_rs_cont], label='Random Search (Continuous)')
@@ -72,3 +82,4 @@ ax.set_xlabel("Required Lm (lbs)")
 ax.set_ylabel("Tire Mass (kg)")
 plt.tight_layout() 
 plt.show() 
+# %%
