@@ -39,19 +39,19 @@ for i, req_Lm in enumerate(Lm_testing_range):
     enum_time = time.time() 
     
     tire = rs_discrete(req_Lm, 0, scope_disc, 1)
-    res_rs_disc.append((tire.max_load_capacity(exact=True), tire.inflation_medium_mass()))
+    res_rs_disc.append(tire)
     
     tire = rs_continuous(req_Lm, 0, scope_cont, 1)
-    res_rs_cont.append((tire.max_load_capacity(exact=True), tire.inflation_medium_mass()))
+    res_rs_cont.append(tire)
     
     tire = bayes_opt(
         req_Lm, 0, scope_cont, init_points=10, n_iter=100, util_kind='ucb', util_kappa=8, 
         util_kappa_decay=0.95, util_kappa_decay_delay=50
     )
-    res_bayes.append((tire.max_load_capacity(exact=True), tire.inflation_medium_mass()))
+    res_bayes.append(tire)
     
     tire = gradients_opt(req_Lm, 0, scope_cont)
-    res_gradients.append((tire.max_load_capacity(exact=True), tire.inflation_medium_mass()))
+    res_gradients.append(tire)
     
     print("{}\nAnalysis {}/{} completed \t req_Lm = {}\nLm Elapsed Time: {} s \t Total Elapsed Time: {} s\n{}".format(
         "*"*50, i+1, len(Lm_testing_range), round(req_Lm, 2), 
@@ -61,10 +61,10 @@ for i, req_Lm in enumerate(Lm_testing_range):
 # %% Plot req_Lm vs. opt_Lm 
 fig, ax = plt.subplots()
 ax.plot(Lm_testing_range, Lm_testing_range, '--', label='Reference')
-ax.scatter(Lm_testing_range, [res[0] for res in res_rs_disc], label='Random Search (Discrete)')
-ax.scatter(Lm_testing_range, [res[0] for res in res_rs_cont], label='Random Search (Continuous)')
-ax.scatter(Lm_testing_range, [res[0] for res in res_bayes], label='Bayesian Optimization')
-ax.scatter(Lm_testing_range, [res[0] for res in res_gradients], label='Gradients-Based Optimization')
+ax.scatter(Lm_testing_range, [res.max_load_capacity(exact=True) for res in res_rs_disc], label='Random Search (Discrete)')
+ax.scatter(Lm_testing_range, [res.max_load_capacity(exact=True) for res in res_rs_cont], label='Random Search (Continuous)')
+ax.scatter(Lm_testing_range, [res.max_load_capacity(exact=True) for res in res_bayes], label='Bayesian Optimization')
+ax.scatter(Lm_testing_range, [res.max_load_capacity(exact=True) for res in res_gradients], label='Gradients-Based Optimization')
 ax.legend() 
 ax.set_xlabel("Required Lm (lbs)")
 ax.set_ylabel("Optimized Lm (lbs)")
@@ -73,13 +73,25 @@ plt.show()
 
 # %% Plot req_Lm vs. opt_mass 
 fig, ax = plt.subplots()
-ax.scatter(Lm_testing_range, [res[1] for res in res_rs_disc], label='Random Search (Discrete)')
-ax.scatter(Lm_testing_range, [res[1] for res in res_rs_cont], label='Random Search (Continuous)')
-ax.scatter(Lm_testing_range, [res[1] for res in res_bayes], label='Bayesian Optimization')
-ax.scatter(Lm_testing_range, [res[1] for res in res_gradients], label='Gradients-Based Optimization')
+ax.scatter(Lm_testing_range, [res.inflation_medium_mass() for res in res_rs_disc], label='Random Search (Discrete)')
+ax.scatter(Lm_testing_range, [res.inflation_medium_mass() for res in res_rs_cont], label='Random Search (Continuous)')
+ax.scatter(Lm_testing_range, [res.inflation_medium_mass() for res in res_bayes], label='Bayesian Optimization')
+ax.scatter(Lm_testing_range, [res.inflation_medium_mass() for res in res_gradients], label='Gradients-Based Optimization')
 ax.legend() 
 ax.set_xlabel("Required Lm (lbs)")
 ax.set_ylabel("Tire Mass (kg)")
 plt.tight_layout() 
 plt.show() 
+# %% Plot req_Lm vs. asp_ratio
+fig, ax = plt.subplots() 
+ax.scatter(Lm_testing_range, [res.aspect_ratio() for res in res_rs_disc], label='Random Search (Discrete)')
+ax.scatter(Lm_testing_range, [res.aspect_ratio() for res in res_rs_cont], label='Random Search (Continuous)')
+ax.scatter(Lm_testing_range, [res.aspect_ratio() for res in res_bayes], label='Bayesian Optimization')
+ax.scatter(Lm_testing_range, [res.aspect_ratio() for res in res_gradients], label='Gradients-Based Optimization')
+ax.legend() 
+ax.set_xlabel("Required Lm (lbs)")
+ax.set_ylabel("Aspect Ratio")
+plt.tight_layout() 
+plt.show() 
+
 # %%

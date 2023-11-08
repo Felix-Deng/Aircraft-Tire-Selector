@@ -1,5 +1,5 @@
 import inspect
-from typing import List
+from typing import List, Optional
 import numpy as np 
 from scipy import constants 
 
@@ -100,6 +100,17 @@ Tire Performance:
             List[float]: ['PR', 'Dm', 'Wm', 'D', 'DF'] 
         """
         return [self.PR, self.Dm, self.Wm, self.D, self.DF] 
+    
+    def aspect_ratio(self) -> Optional[float]: 
+        """Return the aspect ratio of the tire 
+
+        Returns:
+            Optional[float]: aspect ratio
+        """
+        try: 
+            return (self.Dm - self.D) / 2 / self.Wm
+        except ZeroDivisionError:
+            return None 
 
     def max_load_capacity(self, exact=False) -> float: 
         """
