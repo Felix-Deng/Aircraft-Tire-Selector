@@ -37,8 +37,8 @@ def is_geo_valid(dim: List[float], req_Lm: float) -> Union[Tire, bool]:
     return tire 
 
 def rs_discrete(
-    req_Lm: float, speed_index: float, scope: Dict[str, np.ndarray], step_size: int, 
-    iter=10000, runtime=15*60, fitness=1e-6, init_dim=[] 
+    req_Lm: float, speed_index: float, scopes: Dict[str, np.ndarray], step_size: int, 
+    iter=1000, runtime=15*60, fitness=1e-3, init_dim=[] 
 ) -> Optional[Tire]: 
     """Use random search (RS) to search for an optimized tire design 
     in the discrete design space. 
@@ -46,7 +46,7 @@ def rs_discrete(
     Args:
         req_Lm (float): minimum required loading capability 
         speed_index (float): the speed index of the target aircraft design 
-        scope (Dict[str, np.ndarray]): the domain of all design variables 
+        scopes (Dict[str, np.ndarray]): the domain of all design variables 
             Dict[name_of_variable, array_of_all_available_values]
         step_size (int): radius of the hypersphere, in number of array index 
         iter (int, optional): stopping criterion in number of iterations. Defaults to 10000.
@@ -77,7 +77,7 @@ def rs_discrete(
     if random_init: 
         while True: 
             geo_dim = [
-                scope[var][np.random.randint(0, len(scope[var]))] 
+                scopes[var][np.random.randint(0, len(scopes[var]))] 
                 for var in design_var
             ]
             init_tire = is_geo_valid(geo_dim, req_Lm) 
@@ -98,11 +98,11 @@ def rs_discrete(
             temp_dim = [] 
             valid_move = True 
             for ind, var in enumerate(design_var): 
-                scope_ind = np.where(scope[var] == curr_best_dim[ind])[0][0]
+                scope_ind = np.where(scopes[var] == curr_best_dim[ind])[0][0]
                 move_ind = scope_ind + move[ind] * step_size
                 # Check if the new move is going out of the variable's scope 
-                if 0 <= move_ind < len(scope[var]): 
-                    temp_dim.append(scope[var][move_ind])
+                if 0 <= move_ind < len(scopes[var]): 
+                    temp_dim.append(scopes[var][move_ind])
                 else: 
                     valid_move = False 
                     break 
@@ -128,8 +128,8 @@ def rs_discrete(
     return curr_best_tire 
     
 def rs_continuous(
-    req_Lm: float, speed_index: float, scope: Dict[str, Tuple[float, float]], step_size: float, 
-    iter=10000, runtime=15*60, fitness=1e-6, init_dim=[] 
+    req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], step_size: float, 
+    iter=1000, runtime=15*60, fitness=1e-3, init_dim=[] 
 ) -> Optional[Tire]: 
     """Use random search (RS) to search for an optimized tire design 
     in the continuous design space. 
@@ -137,7 +137,7 @@ def rs_continuous(
     Args:
         req_Lm (float): minimum required loading capability 
         speed_index (float): the speed index of the target aircraft design 
-        scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
+        scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         step_size (float): radius of the hypersphere, in float step increment
         iter (int, optional): stopping criterion in number of iterations. Defaults to 10000.
@@ -168,7 +168,7 @@ def rs_continuous(
     if random_init: 
         while True: 
             geo_dim = [
-                np.random.rand() * (scope[var][1] - scope[var][0]) + scope[var][0]
+                np.random.rand() * (scopes[var][1] - scopes[var][0]) + scopes[var][0]
                 for var in design_var
             ]
             init_tire = is_geo_valid(geo_dim, req_Lm) 
@@ -191,7 +191,7 @@ def rs_continuous(
             for ind, var in enumerate(design_var): 
                 move_val = curr_best_dim[ind] + move[ind] * step_size
                 # Check if the new move is going out of the variable's scope 
-                if scope[var][0] <= move_val < scope[var][1]: 
+                if scopes[var][0] <= move_val < scopes[var][1]: 
                     temp_dim.append(move_val)
                 else: 
                     valid_move = False 
@@ -222,14 +222,14 @@ if __name__ == "__main__":
     # np.random.seed(80)
     
     # Test discrete design space 
-    scope = {
+    scopes = {
         "Dm": np.arange(12, 56, 0.5), 
         "Wm": np.concatenate((np.arange(4, 10, 0.25), np.arange(10, 21, 0.5))), 
         "D": np.arange(4, 24, 1), 
         "DF": np.arange(5, 33, 0.25), 
         "PR": np.arange(4, 38, 1)
     }
-    tire = rs_discrete(36000, 0, scope, 1, runtime=10 * 60)
+    tire = rs_discrete(36000, 0, scopes, 1, runtime=10 * 60)
     # tire = rs_discrete(36000, scope, 1, runtime=10 * 60, init_dim=[28, 43, 16, 20, 23.5])
     print("Dm: ", tire.Dm)
     print("Wm: ", tire.Wm)
@@ -240,14 +240,14 @@ if __name__ == "__main__":
     print("Mass_tire: ", tire.inflation_medium_mass())
     
     # Test continuous design space 
-    scope = {
+    scopes = {
         "Dm": (12, 56), 
         "Wm": (4, 21), 
         "D": (4, 24), 
         "DF": (5, 33), 
         "PR": (4, 38)
     }
-    tire = rs_continuous(36000, 0, scope, 1, runtime=10 * 60)
+    tire = rs_continuous(36000, 0, scopes, 1, runtime=10 * 60)
     # tire = rs_continuous(36000, scope, 1, runtime=10 * 60, init_dim=[28, 43, 16, 20, 23.5])
     print("Dm: ", tire.Dm)
     print("Wm: ", tire.Wm)

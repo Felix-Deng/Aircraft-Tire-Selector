@@ -20,18 +20,18 @@ from _models import Tire
     
 
 def _bayes_opt(
-    req_Lm: float, speed_index: float, scope: Dict[str, Tuple[float, float]], 
+    req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
     init_points: int = 5, n_iter: int = 25, util_kind: str = 'ucb', 
     util_kappa: float = 2.576, util_xi: float = 0, 
     util_kappa_decay: float = 1.0, util_kappa_decay_delay: float = 0.0, verbose: int = 0
 ) -> Optional[Tire]: 
     """Use the Bayesian optimization method to search for an optimized aircraft 
-    tire design given scope and utility function hyperparameters. 
+    tire design given scopes and utility function hyperparameters. 
 
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
-        scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
+        scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         init_points (int, optional): number of iterations before the explorations starts 
             the exploration for the maximum. Defaults to 5
@@ -75,7 +75,7 @@ def _bayes_opt(
         kappa_decay=util_kappa_decay, kappa_decay_delay=util_kappa_decay_delay
     )
     optimizer = BayesianOptimization(
-        f=objective_func, pbounds=scope, verbose=verbose
+        f=objective_func, pbounds=scopes, verbose=verbose
     )
     
     optimizer.maximize(
@@ -97,18 +97,18 @@ def _bayes_opt(
 
 
 def bayes_opt(
-    req_Lm: float, speed_index: float, scope: Dict[str, Tuple[float, float]], 
+    req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
     init_points: int = 5, n_iter: int = 25, util_kind: str = 'ucb', 
     util_kappa: float = 2.576, util_xi: float = 0, 
     util_kappa_decay: float = 1.0, util_kappa_decay_delay: float = 0.0, verbose: int = 0
 ) -> Tire: 
     """Use the Bayesian optimization method to search for an optimized aircraft 
-    tire design given scope and utility function hyperparameters. 
+    tire design given scopes and utility function hyperparameters. 
 
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
-        scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
+        scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         init_points (int, optional): number of iterations before the explorations starts 
             the exploration for the maximum. Defaults to 5
@@ -137,7 +137,7 @@ def bayes_opt(
         if counter > 1: 
             print("Bayesian optimization failed to return a valid tire design. Starting attempt number {} ...".format(counter))
         tire = _bayes_opt(
-            req_Lm, speed_index, scope, init_points, n_iter, util_kind, 
+            req_Lm, speed_index, scopes, init_points, n_iter, util_kind, 
             util_kappa, util_xi, util_kappa_decay, 
             util_kappa_decay_delay, verbose
         )
@@ -145,7 +145,7 @@ def bayes_opt(
 
 
 if __name__ == "__main__": 
-    scope = {
+    scopes = {
         "Dm": (12, 56), 
         "Wm": (4, 21), 
         "D": (4, 24), 
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     }
 
     tire = bayes_opt(
-        36000, 0, scope, init_points=10, n_iter=100, util_kind='ucb', util_kappa=8, 
+        36000, 0, scopes, init_points=10, n_iter=100, util_kind='ucb', util_kappa=8, 
         util_kappa_decay=0.95, util_kappa_decay_delay=50, verbose=2
     )
     print(tire)
