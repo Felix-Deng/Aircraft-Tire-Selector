@@ -18,16 +18,16 @@ from _models import Tire
 
 
 def _gradients_opt(
-    req_Lm: float, speed_index: float, scope: Dict[str, Tuple[float, float]], 
+    req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
     optimizer: str='SLSQP', reports=False
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
-    for an optimized aircraft tire design given scope and solver types. 
+    for an optimized aircraft tire design given scopes and solver types. 
 
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
-        scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
+        scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
         reports (bool, optional): should reports be auto generated? Defaults to False.
@@ -36,7 +36,7 @@ def _gradients_opt(
         Optional[Tire]: the optimized tire design 
     """
     init_val = {} # take average for initialized values 
-    for key, item in scope.items(): 
+    for key, item in scopes.items(): 
         init_val[key] = (item[0] + item[1]) / 2
     
     class LoadCapacity(om.ExplicitComponent): 
@@ -130,11 +130,11 @@ def _gradients_opt(
             self.promotes('con_cmp3', any=['con3', 'DF', 'D'])
             self.promotes('con_cmp4', any=['con4', 'Dm', 'D', 'Wm'])
             
-            self.add_design_var('Dm', lower=scope['Dm'][0], upper=scope['Dm'][1])
-            self.add_design_var('Wm', lower=scope['Wm'][0], upper=scope['Wm'][1])
-            self.add_design_var('D', lower=scope['D'][0], upper=scope['D'][1])
-            self.add_design_var('DF', lower=scope['DF'][0], upper=scope['DF'][1])
-            self.add_design_var('PR', lower=scope['PR'][0], upper=scope['PR'][1])
+            self.add_design_var('Dm', lower=scopes['Dm'][0], upper=scopes['Dm'][1])
+            self.add_design_var('Wm', lower=scopes['Wm'][0], upper=scopes['Wm'][1])
+            self.add_design_var('D', lower=scopes['D'][0], upper=scopes['D'][1])
+            self.add_design_var('DF', lower=scopes['DF'][0], upper=scopes['DF'][1])
+            self.add_design_var('PR', lower=scopes['PR'][0], upper=scopes['PR'][1])
             
             self.add_objective("mass")
             self.add_constraint('con1', lower=0.0001)
@@ -166,16 +166,16 @@ def _gradients_opt(
     return tire 
 
 def gradients_opt(
-    req_Lm: float, speed_index: float, scope: Dict[str, Tuple[float, float]], 
+    req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
     optimizer: str='SLSQP', reports=False
 ) -> Tire: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
-    for an optimized aircraft tire design given scope and solver types. 
+    for an optimized aircraft tire design given scopes and solver types. 
 
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
-        scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
+        scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
         reports (bool, optional): should reports be auto generated? Defaults to False.
@@ -189,13 +189,13 @@ def gradients_opt(
         counter += 1
         if counter > 1: 
             print("openMDAO optimization failed to return a valid tire design. Starting attempt number {} ...".format(counter))
-        tire = _gradients_opt(req_Lm, speed_index, scope, optimizer, reports)
+        tire = _gradients_opt(req_Lm, speed_index, scopes, optimizer, reports)
         req_Lm += 1
     return tire 
         
     
 def eval_gradients_opt(
-    scope: Dict[str, Tuple[float, float]], 
+    scopes: Dict[str, Tuple[float, float]], 
     num=30, range_l=1000, range_u=76001, show_plot=False, num_summary=True
 ) -> float:
     """Test the performance (load capacity of the tires) of the optimization 
@@ -203,7 +203,7 @@ def eval_gradients_opt(
     optimized model. 
 
     Args:
-        scope (Dict[str, Tuple[float, float]]): the domain of all design variables 
+        scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         num (int, optional): number of data points to be tested. Defaults to 30.
         range_u (int, optional): upper bound of the testing range of the required 
@@ -222,7 +222,7 @@ def eval_gradients_opt(
     optimized = [] 
     
     for Lm in expected: 
-        tire = gradients_opt(Lm, 0, scope)
+        tire = gradients_opt(Lm, 0, scopes)
         evaluated.append(Lm)
         optimized.append(tire.max_load_capacity(exact=False))
     
@@ -246,19 +246,19 @@ Number of models optimized:
     
 
 if __name__ == "__main__":     
-    scope = {
+    scopes = {
         "Dm": (12, 56), 
         "Wm": (4, 21), 
         "D": (4, 24), 
         "DF": (5, 33), 
         "PR": (4, 38)
     }
-    # tire = gradients_opt(36000, 0, scope)
-    tire = gradients_opt(61000, 0, scope)
+    # tire = gradients_opt(36000, 0, scopes)
+    tire = gradients_opt(61000, 0, scopes)
     print(tire)
     
     # print(
     #     "Standard Error between required and optimized Lm:", 
-    #     eval_gradients_opt(scope, show_plot=True)
+    #     eval_gradients_opt(scopes, show_plot=True)
     # )
     
