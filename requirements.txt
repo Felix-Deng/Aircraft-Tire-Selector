@@ -13,7 +13,7 @@ matplotlib==3.7.2
 networkx==3.1
 numpy==1.24.4
 openmdao==3.27.0
-packaging==23.1
+packaging==23.2
 pandas==2.0.3
 patsy==0.5.3
 Pillow==10.0.0
@@ -29,4 +29,4 @@ statsmodels==0.14.0
 threadpoolctl==3.2.0
 tzdata==2023.3
 urllib3==2.0.4
-zipp==3.16.2
+zipp==3.17.0

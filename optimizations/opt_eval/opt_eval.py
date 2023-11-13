@@ -3,11 +3,11 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-from _models import search_databook
 from randSearch import rs_discrete, rs_continuous
-from bayesOps import bayes_opt
+from bayesOps import bayesOps_opt
 from gradients import gradients_opt
 from genAlg import ga_opt 
+from selector import search_databook
 
 import time 
 import numpy as np 
@@ -50,7 +50,7 @@ for i, req_Lm in enumerate(Lm_testing_range):
     tire = rs_continuous(req_Lm, 0, scope_cont, 1)
     res_rs_cont.append(tire)
     
-    tire = bayes_opt(
+    tire = bayesOps_opt(
         req_Lm, 0, scope_cont, init_points=10, n_iter=100, util_kind='ucb', util_kappa=8, 
         util_kappa_decay=0.95, util_kappa_decay_delay=50
     )

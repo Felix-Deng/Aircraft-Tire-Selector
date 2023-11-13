@@ -23,7 +23,7 @@ from _models import Tire
 class GA_Individual:  
     """A GA individual class for tire design optimization 
     """
-    def __init__(self, chromosome) -> None:
+    def __init__(self, chromosome: List[float]) -> None:
         self.chromosome = chromosome # List[PR, Dm, Wm, D, DF, req_Lm]
         self.fitness = self.cal_fitness() 
         
@@ -46,7 +46,7 @@ class GA_Individual:
             PR=self.chromosome[0], Dm=self.chromosome[1], Wm=self.chromosome[2], 
             D=self.chromosome[3], DF=self.chromosome[4]
         )
-        if tire.max_load_capacity() < self.chromosome[5]: # req_Lm 
+        if tire.max_load_capacity(exact=True) < self.chromosome[5]: # req_Lm 
             return float('inf')
         return tire.inflation_medium_mass() 
     
@@ -141,10 +141,14 @@ def ga_opt(
     
     # Create initial population 
     for _ in range(pop_size): 
-        gnome = GA_Individual.create_gnome(req_Lm, scopes)
-        population.append(GA_Individual(gnome))
+        gnome = GA_Individual([0.01, 0.01, 0.01, 0.01, 0.01, req_Lm])
+        while gnome.fitness == float('inf'): 
+            gnome = GA_Individual.create_gnome(req_Lm, scopes)
+            gnome = GA_Individual(gnome)
+        population.append(gnome)
     
-    curr_best = float('inf')
+    population = sorted(population, key=lambda x:x.fitness)
+    curr_best = population[0].fitness
     
     for i in range(iter): 
         # Perform Elitism, only 10% of fittest population (or 1 individual if pop_size <=10) 
@@ -172,6 +176,7 @@ def ga_opt(
         # Check convergence fitness 
         if population[0].fitness < curr_best: 
             if (curr_best - population[0].fitness) / curr_best <= conv_fitness and curr_best != float('inf'): 
+                print("Convergence fitness satisfied after {} generations".format(i))
                 return Tire(
                     PR=population[0].chromosome[0], Dm=population[0].chromosome[1], 
                     Wm=population[0].chromosome[2], D=population[0].chromosome[3], 
@@ -181,6 +186,7 @@ def ga_opt(
                 curr_best = population[0].fitness 
         # Check runtime 
         if time.time() - start_time >= runtime: 
+            print("Runtime limit reached after {} generations".format(i))
             return Tire(
                 PR=population[0].chromosome[0], Dm=population[0].chromosome[1], 
                 Wm=population[0].chromosome[2], D=population[0].chromosome[3], 
@@ -188,7 +194,7 @@ def ga_opt(
             )
         
         if i % 100 == 0: 
-            print("Generation No. {}:\tlowest tire mass = {} lbs".format(
+            print("Generation No. {}:\tlowest tire mass = {} kg".format(
                 i, population[0].fitness
             ))
     

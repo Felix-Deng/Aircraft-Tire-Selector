@@ -19,7 +19,7 @@ from bayes_opt import BayesianOptimization, UtilityFunction
 from _models import Tire
     
 
-def _bayes_opt(
+def _bayesOps_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
     init_points: int = 5, n_iter: int = 25, util_kind: str = 'ucb', 
     util_kappa: float = 2.576, util_xi: float = 0, 
@@ -96,7 +96,7 @@ def _bayes_opt(
         return None 
 
 
-def bayes_opt(
+def bayesOps_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
     init_points: int = 5, n_iter: int = 25, util_kind: str = 'ucb', 
     util_kappa: float = 2.576, util_xi: float = 0, 
@@ -136,7 +136,7 @@ def bayes_opt(
         counter += 1
         if counter > 1: 
             print("Bayesian optimization failed to return a valid tire design. Starting attempt number {} ...".format(counter))
-        tire = _bayes_opt(
+        tire = _bayesOps_opt(
             req_Lm, speed_index, scopes, init_points, n_iter, util_kind, 
             util_kappa, util_xi, util_kappa_decay, 
             util_kappa_decay_delay, verbose
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         "PR": (4, 38)
     }
 
-    tire = bayes_opt(
+    tire = bayesOps_opt(
         36000, 0, scopes, init_points=10, n_iter=100, util_kind='ucb', util_kappa=8, 
         util_kappa_decay=0.95, util_kappa_decay_delay=50, verbose=2
     )
