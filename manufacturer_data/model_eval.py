@@ -9,7 +9,7 @@ from _models import Tire
 
 
 # Retrieve given tire data 
-with open("manufacturer_data/tire_data.csv") as data_csv: 
+with open("manufacturer_data/bias_tire_data.csv") as data_csv: 
     csv_reader = csv.reader(data_csv)
     # next(csv_reader)  # skip header row
     calc_result = [] 

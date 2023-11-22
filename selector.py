@@ -22,7 +22,7 @@ def search_databook(Lm_des: float, speed_index_des=0.0) -> Optional[Tire]:
     best_tire = None 
     lowest_mass = float('inf') 
     
-    with open("manufacturer_data/tire_data.csv") as data_csv: 
+    with open("manufacturer_data/bias_tire_data.csv") as data_csv: 
         csv_reader = csv.reader(data_csv)
         next(csv_reader)  # skip header row
         
