@@ -17,6 +17,7 @@ Reference: https://www.geeksforgeeks.org/genetic-algorithms/
 from typing import Tuple, Optional, List, Dict
 import time 
 import numpy as np 
+import matplotlib.pyplot as plt 
 from _models import Tire
 
 
@@ -106,7 +107,7 @@ class GA_Individual:
 
 def ga_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    pop_size=20, iter=10000, runtime=15*60, conv_fitness=1e-3
+    pop_size=20, iter=10000, runtime=15*60, conv_fitness=1e-3, print_steps=-1 
 ) -> Optional[Tire]: 
     """Use genetic algorithm (GA) to search for an optimized tire design option 
     in the continuous design space. 
@@ -125,6 +126,8 @@ def ga_opt(
         conv_fitness (float, optional): stopping criterion in optimization fitness 
             for convergence (% improvement relative to previous iteration). 
             Defaults to 1e-3.
+        print_steps (int, optional): -1: print nothing, 0: print when completed only, 
+            ≥ 1 for results after every print_steps of generations. Defaults to -1.
     
     Raises:
         ValueError: if pop_size < 3
@@ -176,7 +179,8 @@ def ga_opt(
         # Check convergence fitness 
         if population[0].fitness < curr_best: 
             if (curr_best - population[0].fitness) / curr_best <= conv_fitness and curr_best != float('inf'): 
-                print("Convergence fitness satisfied after {} generations".format(i))
+                if print_steps >= 0: 
+                    print("Convergence fitness satisfied after {} generations".format(i))
                 return Tire(
                     PR=population[0].chromosome[0], Dm=population[0].chromosome[1], 
                     Wm=population[0].chromosome[2], D=population[0].chromosome[3], 
@@ -186,14 +190,15 @@ def ga_opt(
                 curr_best = population[0].fitness 
         # Check runtime 
         if time.time() - start_time >= runtime: 
-            print("Runtime limit reached after {} generations".format(i))
+            if print_steps >= 0: 
+                print("Runtime limit reached after {} generations".format(i))
             return Tire(
                 PR=population[0].chromosome[0], Dm=population[0].chromosome[1], 
                 Wm=population[0].chromosome[2], D=population[0].chromosome[3], 
                 DF=population[0].chromosome[4]
             )
         
-        if i % 100 == 0: 
+        if print_steps > 0 and i % print_steps == 0: 
             print("Generation No. {}:\tlowest tire mass = {} kg".format(
                 i, population[0].fitness
             ))
@@ -204,6 +209,61 @@ def ga_opt(
         DF=population[0].chromosome[4]
     ) 
 
+
+def eval_ga(scopes: Dict[str, Tuple[float, float]], Lm_step=10000, iter_per_Lm=10) -> None: 
+    """Algorithmic evaluation of the GA optimization method. 
+
+    Args:
+        scopes (Dict[str, Tuple[float, float]]): same to the scopes provided to 
+            the algorithm input. 
+        Lm_step (int, optional): step size for Lm to be tested. Defaults to 10000.
+        iter_per_Lm (int, optional): number of tests for every Lm tested. 
+            Defaults to 10.
+    """
+    Lm_testing_range = np.arange(1000, 76000 + Lm_step, Lm_step)
+    opt_Lm, opt_mass, opt_AR, time_used = [], [], [], [] 
+    for Lm in Lm_testing_range: 
+        temp_Lm, temp_mass, temp_AR, temp_time = [], [], [], [] 
+        for _ in range(iter_per_Lm): 
+            s_time = time.time() 
+            tire = ga_opt(Lm, 0, scopes)
+            temp_time.append(time.time() - s_time)
+            temp_Lm.append(tire.max_load_capacity(exact=True) - Lm)
+            temp_mass.append(tire.inflation_medium_mass())
+            temp_AR.append(tire.aspect_ratio())
+        opt_Lm.append(temp_Lm)
+        opt_mass.append(temp_mass)
+        opt_AR.append(temp_AR)
+        time_used.append(temp_time)
+    
+    # Optimization results plot 
+    _, axs = plt.subplots(3, 1, sharex='all', figsize=(10, 10))
+    axs[0].boxplot(opt_Lm)
+    axs[0].set_ylabel("Lm(opt) - Lm(des) [lbs]")
+    axs[1].boxplot(opt_mass)
+    axs[1].set_ylabel("Tire mass [kg]")
+    axs[2].boxplot(opt_AR)
+    axs[2].set_ylabel("Aspect ratio")
+    
+    axs[2].set_xticks(np.arange(1, len(Lm_testing_range) + 1))
+    axs[2].set_xticklabels(Lm_testing_range, rotation=90)
+    axs[2].set_xlabel("Lm(des) [lbs]")
+    axs[0].set_title("Optimization Evaluation for Genetic Algorithm (GA)")
+    plt.tight_layout() 
+    plt.show() 
+
+    # Performance results plot 
+    _, ax = plt.subplots()
+    ax.boxplot(time_used)
+    ax.set_ylabel("Time used per optimization [sec]")
+    ax.set_xticks(np.arange(1, len(Lm_testing_range) + 1))
+    ax.set_xticklabels(Lm_testing_range, rotation=90)
+    ax.set_xlabel("Lm(des) [lbs]")
+    ax.set_title("Performance Evaluation for Genetic Algorithm (GA)")
+    plt.tight_layout() 
+    plt.show() 
+    
+
 if __name__ == "__main__": 
     scopes = {
         "Dm": (12, 56), 
@@ -212,5 +272,7 @@ if __name__ == "__main__":
         "DF": (5, 33), 
         "PR": (4, 38)
     }
-    tire = ga_opt(36000, 0, scopes)
+    tire = ga_opt(36000, 0, scopes, print_steps=True)
     print(tire)
+    
+    # eval_ga(scopes, 5000, 10)
