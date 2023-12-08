@@ -14,7 +14,10 @@ Reference:
     global optimization tool for Python. 
     https://github.com/fmfn/BayesianOptimization 
 """
+import time 
 from typing import Dict, Tuple, Optional
+import numpy as np 
+import matplotlib.pyplot as plt 
 from bayes_opt import BayesianOptimization, UtilityFunction
 from _models import Tire
     
@@ -143,6 +146,52 @@ def bayesOps_opt(
         )
     return tire 
 
+def eval_bayes(scopes: Dict[str, Tuple[float, float]], Lm_step=10000, iter_per_Lm=10) -> None: 
+    Lm_testing_range = np.arange(1000, 76000 + Lm_step, Lm_step)
+    opt_Lm, opt_mass, opt_AR, time_used = [], [], [], [] 
+    for Lm in Lm_testing_range: 
+        temp_Lm, temp_mass, temp_AR, temp_time = [], [], [], [] 
+        for _ in range(iter_per_Lm): 
+            s_time = time.time() 
+            tire = bayesOps_opt(
+                Lm, 0, scopes, init_points=10, n_iter=100
+            )
+            temp_time.append(time.time() - s_time)
+            temp_Lm.append(tire.max_load_capacity(exact=True) - Lm)
+            temp_mass.append(tire.inflation_medium_mass())
+            temp_AR.append(tire.aspect_ratio())
+        opt_Lm.append(temp_Lm)
+        opt_mass.append(temp_mass)
+        opt_AR.append(temp_AR)
+        time_used.append(temp_time)
+    
+    # Optimization results plot 
+    _, axs = plt.subplots(3, 1, sharex='all', figsize=(10, 10))
+    axs[0].boxplot(opt_Lm)
+    axs[0].set_ylabel("Lm(opt) - Lm(des) [lbs]")
+    axs[1].boxplot(opt_mass)
+    axs[1].set_ylabel("Tire mass [kg]")
+    axs[2].boxplot(opt_AR)
+    axs[2].set_ylabel("Aspect ratio")
+    
+    axs[2].set_xticks(np.arange(1, len(Lm_testing_range) + 1))
+    axs[2].set_xticklabels(Lm_testing_range, rotation=90)
+    axs[2].set_xlabel("Lm(des) [lbs]")
+    axs[0].set_title("Optimization Evaluation for Genetic Algorithm (GA)")
+    plt.tight_layout() 
+    plt.show() 
+
+    # Performance results plot 
+    _, ax = plt.subplots()
+    ax.boxplot(time_used)
+    ax.set_ylabel("Time used per optimization [sec]")
+    ax.set_xticks(np.arange(1, len(Lm_testing_range) + 1))
+    ax.set_xticklabels(Lm_testing_range, rotation=90)
+    ax.set_xlabel("Lm(des) [lbs]")
+    ax.set_title("Performance Evaluation for Genetic Algorithm (GA)")
+    plt.tight_layout() 
+    plt.show() 
+
 
 if __name__ == "__main__": 
     scopes = {
@@ -154,8 +203,22 @@ if __name__ == "__main__":
     }
 
     tire = bayesOps_opt(
-        36000, 0, scopes, init_points=10, n_iter=100, util_kind='ucb', util_kappa=8, 
-        util_kappa_decay=0.95, util_kappa_decay_delay=50, verbose=2
+        36000, 0, scopes, init_points=10, n_iter=200, util_kind='ucb', 
+        util_kappa=8, util_kappa_decay=0.95, util_kappa_decay_delay=50, 
+        verbose=0
     )
     print(tire)
     
+    tire = bayesOps_opt(
+        36000, 0, scopes, init_points=10, n_iter=100, util_kind='ei', 
+        util_xi=0.02, verbose=0
+    )
+    print(tire)
+    
+    tire = bayesOps_opt(
+        36000, 0, scopes, init_points=10, n_iter=100, util_kind='poi', 
+        util_xi=0.04, verbose=0
+    )
+    print(tire)
+    
+    # eval_bayes(scopes, iter_per_Lm=3)
