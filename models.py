@@ -1,5 +1,5 @@
 import inspect
-from typing import List, Optional
+from typing import List, Optional, Tuple 
 import numpy as np 
 from scipy import constants 
 
@@ -250,6 +250,29 @@ Tire Performance:
             X = 0.01 * P - 0.5 
         
         return P + X * Pc + 3 
+    
+    def mech_feasibility(self, brake_load=332.0, alpha=45.0, phi=90.0) -> Tuple[int, int]: 
+        brake_load /= constants.lbf 
+        for i in range(1, int(self.PR)+1): 
+            N = constants.pi * self.inflation_pressure() / brake_load * (
+                (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
+            ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) / i 
+
+            if N <= 330: 
+                return int(N)+1, i
+            # if N < 705: 
+            #     N = constants.pi * self.inflation_pressure() / brake_load * (
+            #         (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
+            #     ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) / (i + 1) 
+            #     return int(N)+1, i+1
+
+
+        # t = constants.pi * self.inflation_pressure() / N * (
+        #     (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
+        # ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) 
+        # t *= constants.lbf 
+        # return brake_load / t 
+        return -1, -1 
 
 
 if __name__ == "__main__": 

@@ -1,0 +1,65 @@
+import re
+import csv 
+import numpy as np 
+from scipy import constants 
+import matplotlib.pyplot as plt 
+import matplotlib.ticker as mtick 
+
+from _models import Tire
+
+# Retrieve given tire data 
+with open("manufacturer_data/bias_tire_data.csv") as data_csv: 
+    csv_reader = csv.reader(data_csv)
+    # next(csv_reader)  # skip header row
+    calc_result = [] 
+    for i, row in enumerate(csv_reader): 
+        if i == 0: 
+            calc_result.append(
+                row + [
+                    'Databook Lm', 'Rounded Calc Lm', 'Exact Calc Lm', 
+                    'Databook Inflation Pressure', 'Calculated Inflation Pressure', 
+                    'Number of Fibres', 'Number of Plies', 'Ply Rating'
+                ]
+            )
+            continue 
+        """ Column index: [
+            'Pre', 'M', 'N', 'D', 'PR', 'SI', 'Lm', 'IP', 'BL', 
+            'DoMax', 'DoMin', 'WMax', 'WMin', 'DsMax', 'WsMax', 
+            'AR', 'LR_RL', 'LR_BL', 'A', 'RD', 'FH', 'G', 'DF', 'QS'
+        ]
+        """
+        # Data clean up 
+        float_dim = ['0' if x == '' else x for x in row[1:-1]] # Replace empty elements with '0'
+        if 'kt' in float_dim[4].lower(): # Check SI (could be in kt or mph or LS)
+            float_dim[4] = re.sub('[A-Za-z ]+', '', float_dim[4]) # format can be 195kt, 195 kt , 195 Kt ,
+            float_dim[4] = float(float_dim[4].split()[0]) * constants.knot / constants.mph
+        elif 'ls' in float_dim[4].lower(): # Using 1 to represent LS 
+            float_dim[4] = '1'
+        float_dim = [float(dim) for dim in float_dim] # Convert All elements to floats
+        
+        # With every row of data, create a new Tire object to calculate maximum load capacity (Lm) 
+        if (float_dim[5] != 0) and (float_dim[8] != 0) and (float_dim[9] != 0):
+            tire = Tire(
+                Pre=row[0].strip(), M=float_dim[0], N=float_dim[1], D=float_dim[2], PR=float_dim[3], SI=float_dim[4], 
+                Lm=float_dim[5], IP=float_dim[6], BL=float_dim[7], DoMax=float_dim[8], DoMin=float_dim[9], WMax=float_dim[10], 
+                WMin=float_dim[11], DsMax=float_dim[12], WsMax=float_dim[13], AR=float_dim[14], LR_RL=float_dim[15], LR_BL=float_dim[16], 
+                A=float_dim[17], RD=float_dim[18], FH=float_dim[19], G=float_dim[20], DF=float_dim[21], QS=row[-1]
+            )
+        
+            rounded_Lm = tire.max_load_capacity()
+            exact_Lm = round(tire.max_load_capacity(exact=True), 2)
+            
+            calc_IP = tire.inflation_pressure() 
+            
+            n_fibre, n_ply = tire.mech_feasibility()
+            
+            calc_result.append(row + [
+                tire.Lm, rounded_Lm, exact_Lm, tire.IP, calc_IP, n_fibre, n_ply, tire.PR
+            ])
+        else:
+            calc_result.append(row + [0, 0, 0, 0, 0, 0, 0, 0])
+
+# Save the calculated Lm to a new CSV to compare with given manufacturer values 
+with open("manufacturer_data/mech_eval.csv", "w") as out_csv: 
+    csv_writer = csv.writer(out_csv)
+    csv_writer.writerows(calc_result)
