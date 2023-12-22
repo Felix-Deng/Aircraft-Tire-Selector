@@ -252,10 +252,7 @@ Tire Performance:
         return P + X * Pc + 3 
 
     def is_mech_feasible(self, N=330, n_ply=0, break_load=332.0, alpha=30.0, phi=90.0) -> bool: 
-        """Calculate the tension each tire reinforcement cord needs to sustain, and 
-        compare if the required load exceeds the designed brake load of the material. 
-
-        $t = pi / P / N * ({\rho}^2 - {\rho_m}^2) / \sin(\alpha) / \sin(\phi)$
+        """Compare if the required load exceeds the designed brake load of the material. 
         
         Args:
             N (int, optional): number of fibres per cord. Defaults to 330.
@@ -270,6 +267,29 @@ Tire Performance:
         Returns:
             bool: if the tire is mechanically feasible based on cord strength 
         """
+        t = self.fiber_tension(N, n_ply, alpha, phi)
+        
+        if t < break_load: # comparison made in N 
+            return True 
+        else: 
+            return False 
+    
+    def fiber_tension(self, N=330, n_ply=0, alpha=30.0, phi=90.0) -> float: 
+        """Calculate the tension each tire reinforcement cord needs to sustain
+
+        $t = pi / P / N * ({\rho}^2 - {\rho_m}^2) / \sin(\alpha) / \sin(\phi)$
+        
+        Args:
+            N (int, optional): number of fibres per cord. Defaults to 330.
+            n_ply (int, optional): number of plies. Defaults to 0 when 
+                half of ply rating is used. 
+            alpha (float, optional): cord angle in degrees. Defaults to 30.0.
+            phi (float, optional): angle between $\Delta s$ tangent line and 
+                the tire meridian line in degree. Defaults to 90.0.
+
+        Returns:
+            float: fiber tension in N 
+        """
         if not n_ply: 
             n_ply = self.PR / 2
             
@@ -277,10 +297,7 @@ Tire Performance:
             (self.Dm/2) ** 2 - (self.Dm/2 - (self.Dm - self.D)/4) ** 2
         ) / np.sin(alpha * np.pi / 180) / np.sin(phi * np.pi / 180) 
         
-        if t * constants.lbf < break_load: # comparison made in N 
-            return True 
-        else: 
-            return False 
+        return t * constants.lbf
 
 
 if __name__ == "__main__": 
@@ -302,4 +319,5 @@ if __name__ == "__main__":
         + '\nMass of tire\'s inflation medium:\n'\
         + f'With databook pressure: {round(tire.inflation_medium_mass(), 2)} kg\n'\
         + f'With calculated pressure: {round(tire.inflation_medium_mass(P_gas=tire.IP), 2)} kg'
+        + f'\nFiber tension: {tire.fiber_tension()} N'
     )

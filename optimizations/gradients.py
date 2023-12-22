@@ -23,7 +23,7 @@ from selector import search_databook
 
 def _gradients_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', reports=False
+    optimizer: str='SLSQP', fiber_break_load=332.0, reports=False, disp=False 
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -34,7 +34,10 @@ def _gradients_opt(
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
+        fiber_break_load (float, optional): cord fiber material designed breaking load in N. 
+                Defaults to 332.0.
         reports (bool, optional): should reports be auto generated? Defaults to False.
+        disp (bool, optional): should convergence messages be printed? Defaults to False. 
 
     Returns:
         Optional[Tire]: the optimized tire design 
@@ -69,7 +72,7 @@ def _gradients_opt(
             outputs['Lm'] = tire.max_load_capacity(exact=True)
 
     class GasMass(om.ExplicitComponent): 
-        """The explicite MDA component that defines the objective 
+        """The explicit MDA component that defines the objective 
         for optimization. 
         """
         def setup(self): 
@@ -93,6 +96,31 @@ def _gradients_opt(
             tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
             outputs['mass'] = tire.inflation_medium_mass()
             
+    class MechFeasibility(om.ExplicitComponent): 
+        """The explicit component that calculates cord load for 
+        mechanical feasibility evaluation 
+        """
+        def setup(self): 
+            self.add_input('Dm', val=init_val['Dm'])
+            self.add_input('Wm', val=init_val['Wm'])
+            self.add_input('D', val=init_val['D'])
+            self.add_input('DF', val=init_val['DF'])
+            self.add_input('PR', val=init_val['PR'])
+            self.add_output('fiber_tension')
+        
+        def setup_partials(self):
+            self.declare_partials('*', '*', method='fd')
+        
+        def compute(self, inputs, outputs):
+            Dm = inputs['Dm']
+            Wm = inputs['Wm']
+            D = inputs['D']
+            DF = inputs['DF']
+            PR = inputs['PR']
+            
+            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
+            outputs['fiber_tension'] = tire.fiber_tension()
+            
 
     class TireMDA(om.Group): 
         """The MDA group that connects all disciplines, 
@@ -101,6 +129,7 @@ def _gradients_opt(
         def setup(self):
             cycle = self.add_subsystem('cycle', om.Group())
             cycle.add_subsystem('d', LoadCapacity())
+            cycle.add_subsystem('e', MechFeasibility())
             
             cycle.nonlinear_solver = om.NonlinearBlockGS()
             cycle.linear_solver = om.ScipyKrylov()
@@ -123,9 +152,9 @@ def _gradients_opt(
                 )
             ) # aspect ratio 
             
-            
         def configure(self):
             self.cycle.promotes('d', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['Lm'])
+            self.cycle.promotes('e', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['fiber_tension'])
             self.promotes('cycle', any=['*'])
             
             self.promotes('obj_cmp', any=['Dm', 'Wm', 'D', 'DF', 'PR', 'mass'])
@@ -149,8 +178,11 @@ def _gradients_opt(
     prob = om.Problem(reports=reports) 
     prob.model = TireMDA()
     prob.driver = om.ScipyOptimizeDriver(optimizer=optimizer) 
+    prob.driver.options['tol'] = 1e-9
+    prob.driver.options['disp'] = disp
     
     prob.model.add_constraint('Lm', lower=req_Lm) 
+    prob.model.add_constraint('fiber_tension', upper=fiber_break_load)
     prob.model.approx_totals() 
     
     prob.setup() 
@@ -171,7 +203,7 @@ def _gradients_opt(
 
 def gradients_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', reports=False
+    optimizer: str='SLSQP', reports=False, disp=False 
 ) -> Tire: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -183,6 +215,7 @@ def gradients_opt(
             Dict[name_of_variable, Tuple[min_value, max_value]]
         optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
         reports (bool, optional): should reports be auto generated? Defaults to False.
+        disp (bool, optional): should convergence messages be printed? Defaults to False. 
 
     Returns:
         Tire: the optimized tire design 
@@ -193,7 +226,7 @@ def gradients_opt(
         counter += 1
         if counter > 1: 
             print("openMDAO optimization failed to return a valid tire design. Starting attempt number {} ...".format(counter))
-        tire = _gradients_opt(req_Lm, speed_index, scopes, optimizer, reports)
+        tire = _gradients_opt(req_Lm, speed_index, scopes, optimizer, reports=reports, disp=disp)
         req_Lm += 1
     return tire 
         
@@ -228,7 +261,7 @@ def eval_gradients_opt(
         ref_tire = search_databook(Lm)
         for _ in range(iter_per_Lm): 
             st = time.time() 
-            tire = gradients_opt(Lm, 0, scopes, optimizer)
+            tire = gradients_opt(Lm, 0, scopes, optimizer=optimizer)
             temp_time.append(time.time() - st)
             temp_Lm.append(tire.max_load_capacity(exact=True) - Lm)
             temp_mass.append(ref_tire.inflation_medium_mass() - tire.inflation_medium_mass())
@@ -282,7 +315,7 @@ if __name__ == "__main__":
         "DF": (5, 33), 
         "PR": (4, 38)
     }
-    tire = gradients_opt(36000, 0, scopes)
+    tire = gradients_opt(36000, 0, scopes, optimizer='SLSQP', disp=True)
     print(tire)
     
     # opt, eff = eval_gradients_opt(scopes, optimizer='SLSQP')

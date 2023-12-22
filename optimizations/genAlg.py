@@ -52,6 +52,8 @@ class GA_Individual:
         )
         if tire.max_load_capacity(exact=True) < self.chromosome[5]: # req_Lm 
             return float('inf')
+        if not tire.is_mech_feasible(): 
+            return float('inf')
         return tire.inflation_medium_mass() 
     
     @classmethod 
