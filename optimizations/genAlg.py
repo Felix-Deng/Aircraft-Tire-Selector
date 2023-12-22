@@ -333,21 +333,20 @@ if __name__ == "__main__":
         "PR": (4, 38)
     }
     
-    tire = ga_opt(36000, 0, scopes, print_steps=True)
+    tire = ga_opt(36000, 0, scopes, pop_size=35, prob_mutate=0.3, print_steps=True)
     print(tire)
     
     # np.random.seed(80)
-    # opt, eff = eval_ga(scopes, 20, 0.15, use_init_gene=False, conv_fitness=1e-4)
-    # opt, eff = eval_ga(scopes, 20, 0.2, use_init_gene=True, conv_fitness=1e-4)
+    # opt, eff = eval_ga(scopes, 35, 0.3, use_init_gene=False, conv_fitness=1e-4)
     # print("Optimality: {}, efficiency: {}".format(opt, eff))
     
     # eval_opt, eval_eff = [], []
     # testing_pop_size = np.arange(10, 55, 5)
-    # testing_mutate_prob = np.arange(0.1, 0.6, 0.1)
+    # # testing_mutate_prob = np.arange(0.1, 0.6, 0.1)
     # for i in testing_pop_size: 
     # # for i in testing_mutate_prob: 
-    #     opt, eff = eval_ga(scopes, i, 0.3, use_init_gene=False, show_plot=False)
-    #     # opt, eff = eval_ga(scopes, 40, i, use_init_gene=False, show_plot=False)
+    #     opt, eff = eval_ga(scopes, i, 0.15, use_init_gene=False, show_plot=False)
+    #     # opt, eff = eval_ga(scopes, 35, i, use_init_gene=False, show_plot=False)
     #     eval_opt.append(opt)
     #     eval_eff.append(eff)
     # print(eval_opt)

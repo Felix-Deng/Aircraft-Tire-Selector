@@ -178,7 +178,7 @@ def _gradients_opt(
     prob = om.Problem(reports=reports) 
     prob.model = TireMDA()
     prob.driver = om.ScipyOptimizeDriver(optimizer=optimizer) 
-    prob.driver.options['tol'] = 1e-9
+    prob.driver.options['tol'] = 1e-4
     prob.driver.options['disp'] = disp
     
     prob.model.add_constraint('Lm', lower=req_Lm) 
