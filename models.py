@@ -251,7 +251,7 @@ Tire Performance:
         
         return P + X * Pc + 3 
 
-    def mech_feasibility(self, N=330, n_ply=0, brake_load=332.0, alpha=30.0, phi=90.0) -> bool: 
+    def is_mech_feasible(self, N=330, n_ply=0, break_load=332.0, alpha=30.0, phi=90.0) -> bool: 
         """Calculate the tension each tire reinforcement cord needs to sustain, and 
         compare if the required load exceeds the designed brake load of the material. 
 
@@ -261,7 +261,7 @@ Tire Performance:
             N (int, optional): number of fibres per cord. Defaults to 330.
             n_ply (int, optional): number of plies. Defaults to 0 when 
                 half of ply rating is used. 
-            brake_load (float, optional): material designed brake load in N. 
+            break_load (float, optional): material designed breaking load in N. 
                 Defaults to 332.0.
             alpha (float, optional): cord angle in degrees. Defaults to 30.0.
             phi (float, optional): angle between $\Delta s$ tangent line and 
@@ -276,9 +276,8 @@ Tire Performance:
         t = np.pi * self.inflation_pressure() / (N * self.PR/2) * (
             (self.Dm/2) ** 2 - (self.Dm/2 - (self.Dm - self.D)/4) ** 2
         ) / np.sin(alpha * np.pi / 180) / np.sin(phi * np.pi / 180) 
-        t *= constants.lbf # convert lbf to N
         
-        if t < brake_load: 
+        if t * constants.lbf < break_load: # comparison made in N 
             return True 
         else: 
             return False 

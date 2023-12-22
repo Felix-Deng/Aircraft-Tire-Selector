@@ -36,17 +36,19 @@ for Dm in RANGE_Dm:
             for Wm in RANGE_Wm[(0.5 <= (Dm - D)/2/RANGE_Wm) & ((Dm - D)/2/RANGE_Wm <= 1)]: # (C3)
                 for PR in RANGE_PR: 
                     tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
-                    data.append([
-                        Dm, Wm, D, DF, PR, (Dm - D)/2/Wm, 
-                        tire.max_load_capacity(), 
-                        tire.inflation_medium_mass()
-                    ])
+                    if tire.is_mech_feasible(): 
+                        data.append([
+                            Dm, Wm, D, DF, PR, (Dm - D)/2/Wm, 
+                            tire.max_load_capacity(), 
+                            tire.inflation_medium_mass()
+                        ])
+
 et = time.time() 
 print("Elapsed time:", et - st, "sec")
 print("Number of tires generated:", len(data)-1)
 
 # Save data 
-with open('synthetic_data/synthetic_data.csv', 'w') as csvfile: 
+with open('synthetic_data.csv', 'w') as csvfile: 
     csv_writer = csv.writer(csvfile)
     for row in data: 
         csv_writer.writerow(row)

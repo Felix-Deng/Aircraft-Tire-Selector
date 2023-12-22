@@ -1,12 +1,13 @@
 import re
 import csv
 import copy 
+import time 
 from typing import Optional
 
 import numpy as np 
 from scipy import constants 
 
-from models import Tire
+from _models import Tire
 
 def search_databook(Lm_des: float, speed_index_des=0.0) -> Optional[Tire]:
     """Given the desired loading capacity, find the corresponding tire specifications 
@@ -56,5 +57,28 @@ def search_databook(Lm_des: float, speed_index_des=0.0) -> Optional[Tire]:
         print("No suitable tire design options can be found from the manufacturer databook.")
     return best_tire
 
+def eval_selector(Lm_testing_range=(2000, 72000), Lm_step=10000, iter_per_Lm=3) -> float: 
+    """
+    Args:
+        Lm_testing_range (tuple, optional): lower and upper bound of Lm for testing. 
+            Defaults to (2000, 72000).
+        Lm_step (int, optional): step size for Lm to be tested. Defaults to 10000.
+        iter_per_Lm (int, optional): number of tests for every Lm tested. 
+            Defaults to 3.
+
+    Returns:
+        float: average time required for one tire selection. 
+    """
+    testing_Lm = np.arange(Lm_testing_range[0], Lm_testing_range[1] + Lm_step, Lm_step)
+    total_time = 0
+    for Lm in testing_Lm: 
+        for _ in range(iter_per_Lm): 
+            st = time.time() 
+            _ = search_databook(Lm)
+            total_time += time.time() - st 
+    return total_time / len(testing_Lm) / 3
+
+
 if __name__ == "__main__": 
     print(search_databook(30000))
+    # print(eval_selector())

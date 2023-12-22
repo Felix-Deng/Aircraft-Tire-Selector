@@ -9,12 +9,16 @@ Specifically, the openMDAO framework [1], developed by NASA, is utilized in this
     https://doi.org/10.1007/s00158-019-02211-z
 """
 
-from typing import Dict, Tuple, Optional
+import time 
+from typing import Dict, Tuple, Optional, Union 
+
 import numpy as np 
 from scipy.stats import linregress
-import openmdao.api as om
 import matplotlib.pyplot as plt 
+import openmdao.api as om
+
 from _models import Tire
+from selector import search_databook 
 
 
 def _gradients_opt(
@@ -195,9 +199,9 @@ def gradients_opt(
         
     
 def eval_gradients_opt(
-    scopes: Dict[str, Tuple[float, float]], 
-    num=30, range_l=1000, range_u=76001, show_plot=False, num_summary=True
-) -> float:
+    scopes: Dict[str, Tuple[float, float]], optimizer: str='SLSQP', 
+    Lm_testing_range=(2000, 72000), Lm_step=10000, iter_per_Lm=3, show_plot=True
+) -> Union[float, float]:
     """Test the performance (load capacity of the tires) of the optimization 
     setup by comparing the expected performance to the performance of the 
     optimized model. 
@@ -205,44 +209,69 @@ def eval_gradients_opt(
     Args:
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
-        num (int, optional): number of data points to be tested. Defaults to 30.
-        range_u (int, optional): upper bound of the testing range of the required 
-            load capacity. Defaults to 1000.
-        range_l (int, optional): lower bound of the testing range of the required 
-            load capacity. Defaults to 76001.
-        show_plot (bool, optional): show the comparison plot. Defaults to False.
-        num_summary (bool, optional): print out a summary of number of models optimized. 
-            Defaults to True. 
-
+        optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
+        Lm_testing_range (tuple, optional): lower and upper bound of Lm for testing. 
+            Defaults to (2000, 72000).
+        Lm_step (int, optional): step size for Lm to be tested. Defaults to 10000.
+        iter_per_Lm (int, optional): number of tests for every Lm tested. 
+            Defaults to 3.
+        show_plot (bool, optional): show the comparison plot. Defaults to True.
+        
     Returns:
-        float: the standard error of the linear regression fitted for the comparison. 
+        Union[float, float]: optimality and efficiency of the testing pop_size. 
     """
-    expected = np.arange(range_l, range_u, (range_u - range_l) // num)
-    evaluated = [] # keep track of values of successful optimizations 
-    optimized = [] 
+    testing_Lm = np.arange(Lm_testing_range[0], Lm_testing_range[1] + Lm_step, Lm_step)
+    opt_Lm, opt_mass, opt_AR, time_used = [], [], [], []
     
-    for Lm in expected: 
-        tire = gradients_opt(Lm, 0, scopes)
-        evaluated.append(Lm)
-        optimized.append(tire.max_load_capacity(exact=False))
+    for Lm in testing_Lm: 
+        temp_Lm, temp_mass, temp_AR, temp_time = [], [], [], [] 
+        ref_tire = search_databook(Lm)
+        for _ in range(iter_per_Lm): 
+            st = time.time() 
+            tire = gradients_opt(Lm, 0, scopes, optimizer)
+            temp_time.append(time.time() - st)
+            temp_Lm.append(tire.max_load_capacity(exact=True) - Lm)
+            temp_mass.append(ref_tire.inflation_medium_mass() - tire.inflation_medium_mass())
+            temp_AR.append(tire.aspect_ratio())
+        opt_Lm.append(temp_Lm)
+        opt_mass.append(temp_mass)
+        opt_AR.append(temp_AR)
+        time_used.append(temp_time)
     
+    optimality = sum([np.mean(item) for item in opt_mass])
+    efficiency = np.mean([np.mean(item) for item in time_used])
+    # print("Optimality:", optimality)
+    # print("Efficiency:", efficiency)
+    
+    # Optimization results plot 
     if show_plot: 
-        plt.scatter(evaluated, optimized)
-        plt.plot(expected, expected, ls='--')
-        plt.xlabel("Required Lm")
-        plt.ylabel("Optimized Lm")
+        _, axs = plt.subplots(3, 1, sharex='all', figsize=(10, 10))
+        axs[0].boxplot(opt_Lm)
+        axs[0].set_ylabel("Lm(opt) - Lm(des) [lbs]")
+        axs[1].boxplot(opt_mass)
+        axs[1].set_ylabel("Tire mass [kg]")
+        axs[2].boxplot(opt_AR)
+        axs[2].set_ylabel("Aspect ratio")
+        
+        axs[2].set_xticks(np.arange(1, len(testing_Lm) + 1))
+        axs[2].set_xticklabels(testing_Lm, rotation=90)
+        axs[2].set_xlabel("Lm(des) [lbs]")
+        axs[0].set_title("Optimization Evaluation for Genetic Algorithm (GA)")
+        plt.tight_layout() 
+        plt.show() 
+
+        # Performance results plot 
+        _, ax = plt.subplots()
+        ax.boxplot(time_used)
+        ax.set_ylabel("Time used per optimization [sec]")
+        ax.set_xticks(np.arange(1, len(testing_Lm) + 1))
+        ax.set_xticklabels(testing_Lm, rotation=90)
+        ax.set_xlabel("Lm(des) [lbs]")
+        ax.set_title("Performance Evaluation for Genetic Algorithm (GA)")
         plt.tight_layout() 
         plt.show() 
     
-    if num_summary: 
-        print(f'''{'*' * 30}
-Number of models optimized: 
-    Total: {len(expected)}
-    successful: {len(optimized)}
-    Success rate: {len(optimized) / len(expected)}
-{'*' * 30}''')
-    
-    return linregress(evaluated, optimized).stderr
+    return optimality, efficiency
     
 
 if __name__ == "__main__":     
@@ -253,12 +282,10 @@ if __name__ == "__main__":
         "DF": (5, 33), 
         "PR": (4, 38)
     }
-    # tire = gradients_opt(36000, 0, scopes)
-    tire = gradients_opt(61000, 0, scopes)
+    tire = gradients_opt(36000, 0, scopes)
     print(tire)
     
-    # print(
-    #     "Standard Error between required and optimized Lm:", 
-    #     eval_gradients_opt(scopes, show_plot=True)
-    # )
+    # opt, eff = eval_gradients_opt(scopes, optimizer='SLSQP')
+    # print("Optimality: {}, efficiency: {}".format(opt, eff))
+    
     

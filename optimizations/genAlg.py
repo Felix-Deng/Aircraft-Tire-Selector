@@ -14,11 +14,14 @@ General algorithm:
     
 Reference: https://www.geeksforgeeks.org/genetic-algorithms/ 
 """
-from typing import Tuple, Optional, List, Dict
 import time 
+import copy 
+from typing import Tuple, Optional, Union, List, Dict
 import numpy as np 
 import matplotlib.pyplot as plt 
+
 from _models import Tire
+from selector import search_databook 
 
 
 class GA_Individual:  
@@ -80,7 +83,9 @@ class GA_Individual:
             self.mutated_gene(scopes[var]) for var in ["PR", "Dm", "Wm", "D", "DF"]
         ] + [req_Lm]
     
-    def mate(self, par2: 'GA_Individual', scopes: Dict[str, Tuple[float, float]]) -> 'GA_Individual': 
+    def mate(
+        self, par2: 'GA_Individual', scopes: Dict[str, Tuple[float, float]], prob_mutate=0.1
+    ) -> 'GA_Individual': 
         """Perform mating between two parent GA_Individual and produce a 
         new offspring GA_Individual. 
 
@@ -88,17 +93,24 @@ class GA_Individual:
             par2 (GA_Individual): parent 2 of the mating 
             scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
                 Dict[name_of_variable, array_of_all_available_values]
+            prob_mutate (float, optional): the probability of mutation for every mating. 
+                Defaults to 0.1. 
+        
+        Raise: 
+            ValueError: prob_mutate must be between 0 and 1. 
 
         Returns:
             GA_Individual: the new offspring 
         """
+        if prob_mutate > 1 or prob_mutate < 0: 
+            raise ValueError("prob_mutate must be between 0 and 1.")
         vars = ["PR", "Dm", "Wm", "D", "DF"]
         child_chromosome = []
         for i, (gp1, gp2) in enumerate(zip(self.chromosome[:-1], par2.chromosome[:-1])): 
             prob = np.random.rand() 
-            if prob < 0.45: # insert gene from parent 1 
+            if prob < (1 - prob_mutate) / 2: # insert gene from parent 1 
                 child_chromosome.append(gp1)
-            elif prob < 0.90: # insert gene from parent 2 
+            elif prob < 1 - prob_mutate: # insert gene from parent 2 
                 child_chromosome.append(gp2)
             else: # insert random gene (mutate) to maintain diversity 
                 child_chromosome.append(self.mutated_gene(scopes[vars[i]]))
@@ -107,7 +119,8 @@ class GA_Individual:
 
 def ga_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    pop_size=20, iter=10000, runtime=15*60, conv_fitness=1e-3, print_steps=-1 
+    pop_size=20, prob_mutate=0.1, init_gene=[], n_iter=10000, runtime=15*60, conv_fitness=1e-3, 
+    print_steps=-1 
 ) -> Optional[Tire]: 
     """Use genetic algorithm (GA) to search for an optimized tire design option 
     in the continuous design space. 
@@ -118,8 +131,12 @@ def ga_opt(
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, array_of_all_available_values]
         pop_size (int, optional): size of the GA population to maintain. 
-            Defaults to 10.
-        iter (int, optional): stopping criterion in number of iterations. 
+            Defaults to 20.
+        prob_mutate (float, optional): the probability of mutation for every mating. 
+            Defaults to 0.1. 
+        init_gene (list, optional): the initial gene to start the evolution with. 
+            Defaults to []. 
+        n_iter (int, optional): stopping criterion in number of iterations. 
             Defaults to 10000.
         runtime (float, optional): stopping criterion in runtime length (sec). 
             Defaults to 15*60.
@@ -144,16 +161,19 @@ def ga_opt(
     
     # Create initial population 
     for _ in range(pop_size): 
-        gnome = GA_Individual([0.01, 0.01, 0.01, 0.01, 0.01, req_Lm])
-        while gnome.fitness == float('inf'): 
-            gnome = GA_Individual.create_gnome(req_Lm, scopes)
-            gnome = GA_Individual(gnome)
+        if not init_gene: 
+            gnome = GA_Individual([0.01, 0.01, 0.01, 0.01, 0.01, req_Lm])
+            while gnome.fitness == float('inf'): 
+                gnome = GA_Individual.create_gnome(req_Lm, scopes)
+                gnome = GA_Individual(gnome)
+        else: 
+            gnome = GA_Individual(copy.deepcopy(init_gene))
         population.append(gnome)
     
     population = sorted(population, key=lambda x:x.fitness)
     curr_best = population[0].fitness
     
-    for i in range(iter): 
+    for i in range(n_iter): 
         # Perform Elitism, only 10% of fittest population (or 1 individual if pop_size <=10) 
         # goes to the next generation 
         new_generation = []
@@ -169,7 +189,7 @@ def ga_opt(
         for _ in range(s): 
             parent1 = np.random.choice(population[:int(pop_size*0.5)])
             parent2 = np.random.choice(population[:int(pop_size*0.5)])
-            child = parent1.mate(parent2, scopes)
+            child = parent1.mate(parent2, scopes, prob_mutate)
             new_generation.append(child)
         population = new_generation
 
@@ -210,58 +230,96 @@ def ga_opt(
     ) 
 
 
-def eval_ga(scopes: Dict[str, Tuple[float, float]], Lm_step=10000, iter_per_Lm=10) -> None: 
+def eval_ga(
+    scopes: Dict[str, Tuple[float, float]], pop_size: int, prob_mutate: float, 
+    use_init_gene: bool, Lm_testing_range=(2000, 72000), Lm_step=10000, iter_per_Lm=3, 
+    show_plot=True, n_iter=10000, runtime=15*60, conv_fitness=1e-3 
+) -> Union[float, float]: 
     """Algorithmic evaluation of the GA optimization method. 
 
     Args:
         scopes (Dict[str, Tuple[float, float]]): same to the scopes provided to 
             the algorithm input. 
+        pop_size (int): size of the GA population to maintain. 
+        prob_mutate (float): the probability of mutation for every mating. 
+        use_init_gene (bool): use the reference tire option as the initial 
+            gene to start the evolution with. 
+        Lm_testing_range (tuple, optional): lower and upper bound of Lm for testing. 
+            Defaults to (2000, 72000).
         Lm_step (int, optional): step size for Lm to be tested. Defaults to 10000.
         iter_per_Lm (int, optional): number of tests for every Lm tested. 
-            Defaults to 10.
+            Defaults to 3.
+        show_plot (bool, optional): show the comparison plot. Defaults to True. 
+        n_iter (int, optional): stopping criterion in number of iterations. 
+            Defaults to 10000.
+        runtime (float, optional): stopping criterion in runtime length (sec). 
+            Defaults to 15*60.
+        conv_fitness (float, optional): stopping criterion in optimization fitness 
+            for convergence (% improvement relative to previous iteration). 
+            Defaults to 1e-3.
+    
+    Returns: 
+        Union[float, float]: optimality and efficiency of the testing pop_size. 
     """
-    Lm_testing_range = np.arange(1000, 76000 + Lm_step, Lm_step)
-    opt_Lm, opt_mass, opt_AR, time_used = [], [], [], [] 
-    for Lm in Lm_testing_range: 
+    testing_Lm = np.arange(Lm_testing_range[0], Lm_testing_range[1] + Lm_step, Lm_step)
+    opt_Lm, opt_mass, opt_AR, time_used = [], [], [], []
+    
+    for Lm in testing_Lm: 
         temp_Lm, temp_mass, temp_AR, temp_time = [], [], [], [] 
+        ref_tire = search_databook(Lm)
+        if use_init_gene: 
+            ref_gene = [ref_tire.PR, ref_tire.Dm, ref_tire.Wm, ref_tire.D, ref_tire.DF, Lm] 
+        else: 
+            ref_gene = [] 
         for _ in range(iter_per_Lm): 
             s_time = time.time() 
-            tire = ga_opt(Lm, 0, scopes)
+            tire = ga_opt(
+                Lm, 0, scopes, pop_size=pop_size, prob_mutate=prob_mutate, init_gene=ref_gene, 
+                n_iter=n_iter, runtime=runtime, conv_fitness=conv_fitness
+            )
             temp_time.append(time.time() - s_time)
             temp_Lm.append(tire.max_load_capacity(exact=True) - Lm)
-            temp_mass.append(tire.inflation_medium_mass())
+            temp_mass.append(ref_tire.inflation_medium_mass() - tire.inflation_medium_mass())
             temp_AR.append(tire.aspect_ratio())
         opt_Lm.append(temp_Lm)
         opt_mass.append(temp_mass)
         opt_AR.append(temp_AR)
         time_used.append(temp_time)
     
-    # Optimization results plot 
-    _, axs = plt.subplots(3, 1, sharex='all', figsize=(10, 10))
-    axs[0].boxplot(opt_Lm)
-    axs[0].set_ylabel("Lm(opt) - Lm(des) [lbs]")
-    axs[1].boxplot(opt_mass)
-    axs[1].set_ylabel("Tire mass [kg]")
-    axs[2].boxplot(opt_AR)
-    axs[2].set_ylabel("Aspect ratio")
+    optimality = sum([np.mean(item) for item in opt_mass])
+    efficiency = np.mean([np.mean(item) for item in time_used])
+    # print("Optimality:", optimality)
+    # print("Efficiency:", efficiency)
     
-    axs[2].set_xticks(np.arange(1, len(Lm_testing_range) + 1))
-    axs[2].set_xticklabels(Lm_testing_range, rotation=90)
-    axs[2].set_xlabel("Lm(des) [lbs]")
-    axs[0].set_title("Optimization Evaluation for Genetic Algorithm (GA)")
-    plt.tight_layout() 
-    plt.show() 
+    # Optimization results plot 
+    if show_plot: 
+        _, axs = plt.subplots(3, 1, sharex='all', figsize=(10, 10))
+        axs[0].boxplot(opt_Lm)
+        axs[0].set_ylabel("Lm(opt) - Lm(des) [lbs]")
+        axs[1].boxplot(opt_mass)
+        axs[1].set_ylabel("Tire mass [kg]")
+        axs[2].boxplot(opt_AR)
+        axs[2].set_ylabel("Aspect ratio")
+        
+        axs[2].set_xticks(np.arange(1, len(testing_Lm) + 1))
+        axs[2].set_xticklabels(testing_Lm, rotation=90)
+        axs[2].set_xlabel("Lm(des) [lbs]")
+        axs[0].set_title("Optimization Evaluation for Genetic Algorithm (GA)")
+        plt.tight_layout() 
+        plt.show() 
 
-    # Performance results plot 
-    _, ax = plt.subplots()
-    ax.boxplot(time_used)
-    ax.set_ylabel("Time used per optimization [sec]")
-    ax.set_xticks(np.arange(1, len(Lm_testing_range) + 1))
-    ax.set_xticklabels(Lm_testing_range, rotation=90)
-    ax.set_xlabel("Lm(des) [lbs]")
-    ax.set_title("Performance Evaluation for Genetic Algorithm (GA)")
-    plt.tight_layout() 
-    plt.show() 
+        # Performance results plot 
+        _, ax = plt.subplots()
+        ax.boxplot(time_used)
+        ax.set_ylabel("Time used per optimization [sec]")
+        ax.set_xticks(np.arange(1, len(testing_Lm) + 1))
+        ax.set_xticklabels(testing_Lm, rotation=90)
+        ax.set_xlabel("Lm(des) [lbs]")
+        ax.set_title("Performance Evaluation for Genetic Algorithm (GA)")
+        plt.tight_layout() 
+        plt.show() 
+    
+    return optimality, efficiency
     
 
 if __name__ == "__main__": 
@@ -272,7 +330,27 @@ if __name__ == "__main__":
         "DF": (5, 33), 
         "PR": (4, 38)
     }
+    
     tire = ga_opt(36000, 0, scopes, print_steps=True)
     print(tire)
     
-    # eval_ga(scopes, 5000, 10)
+    # np.random.seed(80)
+    # opt, eff = eval_ga(scopes, 20, 0.15, use_init_gene=False, conv_fitness=1e-4)
+    # opt, eff = eval_ga(scopes, 20, 0.2, use_init_gene=True, conv_fitness=1e-4)
+    # print("Optimality: {}, efficiency: {}".format(opt, eff))
+    
+    # eval_opt, eval_eff = [], []
+    # testing_pop_size = np.arange(10, 55, 5)
+    # testing_mutate_prob = np.arange(0.1, 0.6, 0.1)
+    # for i in testing_pop_size: 
+    # # for i in testing_mutate_prob: 
+    #     opt, eff = eval_ga(scopes, i, 0.3, use_init_gene=False, show_plot=False)
+    #     # opt, eff = eval_ga(scopes, 40, i, use_init_gene=False, show_plot=False)
+    #     eval_opt.append(opt)
+    #     eval_eff.append(eff)
+    # print(eval_opt)
+    # print(eval_eff)
+    # plt.plot(testing_pop_size, eval_opt, label="Optimality")
+    # plt.plot(testing_pop_size, eval_eff, label="Efficiency")
+    # plt.legend() 
+    # plt.show() 
