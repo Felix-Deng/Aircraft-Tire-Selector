@@ -271,7 +271,7 @@ def eval_gradients_opt(
         opt_AR.append(temp_AR)
         time_used.append(temp_time)
     
-    optimality = sum([np.mean(item) for item in opt_mass])
+    optimality = np.mean([np.mean(item) for item in opt_mass])
     efficiency = np.mean([np.mean(item) for item in time_used])
     # print("Optimality:", optimality)
     # print("Efficiency:", efficiency)
@@ -289,7 +289,6 @@ def eval_gradients_opt(
         axs[2].set_xticks(np.arange(1, len(testing_Lm) + 1))
         axs[2].set_xticklabels(testing_Lm, rotation=90)
         axs[2].set_xlabel("Lm(des) [lbs]")
-        axs[0].set_title("Optimization Evaluation for Genetic Algorithm (GA)")
         plt.tight_layout() 
         plt.show() 
 
@@ -300,7 +299,6 @@ def eval_gradients_opt(
         ax.set_xticks(np.arange(1, len(testing_Lm) + 1))
         ax.set_xticklabels(testing_Lm, rotation=90)
         ax.set_xlabel("Lm(des) [lbs]")
-        ax.set_title("Performance Evaluation for Genetic Algorithm (GA)")
         plt.tight_layout() 
         plt.show() 
     

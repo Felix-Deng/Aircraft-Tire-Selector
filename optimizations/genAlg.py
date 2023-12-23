@@ -76,7 +76,7 @@ class GA_Individual:
         Args:
             req_Lm (float): minimum required loading capability 
             scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
-                Dict[name_of_variable, array_of_all_available_values]
+                Dict[name_of_variable, Tuple[min_value, max_value]]
 
         Returns:
             List[float]: the created randomized chromosome: List[PR, Dm, Wm, D, DF, req_Lm]
@@ -94,7 +94,7 @@ class GA_Individual:
         Args:
             par2 (GA_Individual): parent 2 of the mating 
             scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
-                Dict[name_of_variable, array_of_all_available_values]
+                Dict[name_of_variable, Tuple[min_value, max_value]]
             prob_mutate (float, optional): the probability of mutation for every mating. 
                 Defaults to 0.1. 
         
@@ -131,7 +131,7 @@ def ga_opt(
         req_Lm (float): minimum required loading capability 
         speed_index (float): the speed index of the target aircraft design 
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
-            Dict[name_of_variable, array_of_all_available_values]
+            Dict[name_of_variable, Tuple[min_value, max_value]]
         pop_size (int, optional): size of the GA population to maintain. 
             Defaults to 20.
         prob_mutate (float, optional): the probability of mutation for every mating. 
@@ -288,7 +288,7 @@ def eval_ga(
         opt_AR.append(temp_AR)
         time_used.append(temp_time)
     
-    optimality = sum([np.mean(item) for item in opt_mass])
+    optimality = np.mean([np.mean(item) for item in opt_mass])
     efficiency = np.mean([np.mean(item) for item in time_used])
     # print("Optimality:", optimality)
     # print("Efficiency:", efficiency)
@@ -306,7 +306,6 @@ def eval_ga(
         axs[2].set_xticks(np.arange(1, len(testing_Lm) + 1))
         axs[2].set_xticklabels(testing_Lm, rotation=90)
         axs[2].set_xlabel("Lm(des) [lbs]")
-        axs[0].set_title("Optimization Evaluation for Genetic Algorithm (GA)")
         plt.tight_layout() 
         plt.show() 
 
@@ -317,7 +316,6 @@ def eval_ga(
         ax.set_xticks(np.arange(1, len(testing_Lm) + 1))
         ax.set_xticklabels(testing_Lm, rotation=90)
         ax.set_xlabel("Lm(des) [lbs]")
-        ax.set_title("Performance Evaluation for Genetic Algorithm (GA)")
         plt.tight_layout() 
         plt.show() 
     

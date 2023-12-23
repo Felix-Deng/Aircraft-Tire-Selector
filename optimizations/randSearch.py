@@ -278,7 +278,7 @@ def eval_rs(
         opt_AR.append(temp_AR)
         time_used.append(temp_time)
     
-    optimality = sum([np.mean(item) for item in opt_mass])
+    optimality = np.mean([np.mean(item) for item in opt_mass])
     efficiency = np.mean([np.mean(item) for item in time_used])
     # print("Optimality:", optimality)
     # print("Efficiency:", efficiency)
@@ -296,7 +296,6 @@ def eval_rs(
         axs[2].set_xticks(np.arange(1, len(testing_Lm) + 1))
         axs[2].set_xticklabels(testing_Lm, rotation=90)
         axs[2].set_xlabel("Lm(des) [lbs]")
-        axs[0].set_title("Optimization Evaluation for Genetic Algorithm (GA)")
         plt.tight_layout() 
         plt.show() 
 
@@ -307,7 +306,6 @@ def eval_rs(
         ax.set_xticks(np.arange(1, len(testing_Lm) + 1))
         ax.set_xticklabels(testing_Lm, rotation=90)
         ax.set_xlabel("Lm(des) [lbs]")
-        ax.set_title("Performance Evaluation for Genetic Algorithm (GA)")
         plt.tight_layout() 
         plt.show() 
     
@@ -316,7 +314,6 @@ def eval_rs(
     
     
 if __name__ == "__main__": 
-    # np.random.seed(80)
     dis_scopes = {
         "Dm": np.arange(12, 56, 0.5), 
         "Wm": np.concatenate((np.arange(4, 10, 0.25), np.arange(10, 21, 0.5))), 
@@ -340,7 +337,7 @@ if __name__ == "__main__":
     # tire = rs_continuous(36000, con_scopes, 1, runtime=10 * 60, init_dim=[28, 43, 16, 20, 23.5])
     print(tire)
     
-    # Algorithmic evaluation 
+    ################ Algorithmic evaluation ################
     # np.random.seed(80)
     # opt, eff = eval_rs(dis_scopes, 'discrete', 1)
     # print("Optimality: {}, efficiency: {}".format(opt, eff))
