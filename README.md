@@ -1,25 +1,23 @@
 # Aircraft-Tire-Selector
-This program automatically processed given load input and maximum speed, then the program should recommend aircraft tires for selection. 
+This program automatically processes key aircraft design requirements (load input and maximum speed). Through multivariate optimization, aircraft tire design options are recommended to the aircraft landing gear designers for selection. 
 
-## Structure of this repository 
+## Repository structure 
 ```
 - main.py
 - models.py: the Tire class that stores parameters and defines functions of a typical aircraft tire 
-- selector.py: select optimal tire given load requirements from manufacturer data
 - /manufacturer_data: testing and validation with manufacturer's public data
   |-- _methods.py: import models.py from root directory 
-  |-- program_eval.py: calculate difference between calculated and provided values 
-  |-- eval_analysis.py: analysis of the evaluating results from program_eval.py 
-- /optimizations: store all alternative optimization methods used 
+  |-- model_eval.py: calculate difference between calculated and provided values 
+  |-- eval_analysis.py: analysis of the evaluating results from model_eval.py 
+- /optimizations: store all alternative optimization methods used, evaluated with optimization on bias tires only 
   |-- _models.py: import models.py from root directory 
   |-- bayesOps.py: Bayesian optimization method 
   |-- csp.py: method for solving constraint satisfaction problems 
+  |-- genAlg.py: genetic algorithm method 
   |-- gradients.py: method utilizing the openMDAO framework 
+  |-- pso.py: particle swarm optimization method 
   |-- randSearch.py: random search method 
-- /xDSM: the extended design structure matrix (xDSM) for the MDO problem 
-  |-- xdsm_plotter.py: code used to generate the xDSM plot 
-  |-- mdf.pdf: plotted xDSM plot in PDF 
-  |-- mdf.tex: plotted xDSM plot for LaTeX 
+  |-- selector.py: select optimal tire given load requirements from manufacturer data
 ```
 
 ## Development guide 
