@@ -23,7 +23,7 @@
 &
 &
 &
-\node [DataIO] (output_mech) {$I_{speed}$};&
+&
 \\
 %Row 1
 \node [DataIO] (left_output_opt) {$x^*$};&
@@ -97,8 +97,7 @@
 (load-opt) edge [DataLine] (opt)
 (mass-opt) edge [DataLine] (opt)
 (mech-opt) edge [DataLine] (opt)
-(opt) edge [DataLine] (output_opt)
-(mech) edge [DataLine] (output_mech);
+(opt) edge [DataLine] (output_opt);
 \end{pgfonlayer}
 
 \end{tikzpicture}
