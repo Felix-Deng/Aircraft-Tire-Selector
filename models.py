@@ -253,7 +253,7 @@ Tire Performance:
     
     def mech_feasibility(self, brake_load=332.0, alpha=45.0, phi=90.0) -> Tuple[int, int]: 
         brake_load /= constants.lbf 
-        for i in range(1, int(self.PR)+1): 
+        for i in range(1, int(self.PR/2)+1): 
             N = constants.pi * self.inflation_pressure() / brake_load * (
                 (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
             ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) / i 
