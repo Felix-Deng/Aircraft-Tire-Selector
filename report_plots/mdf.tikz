@@ -45,16 +45,16 @@
 &
 \node [DataInter] (load-opt) {$L_m$};&
 &
-\node [Function] (load) {$L_m(x)$};&
+\node [Function] (load) {$\text{Loading Capacity}$};&
 &
-&
+\node [DataInter] (load-mech) {$P_{inflation}$};&
 \\
 %Row 4
 &
 \node [DataInter] (mass-opt) {$m_{tire}$};&
 &
 &
-\node [Function] (mass) {$m_{tire}(x)$};&
+\node [Function] (mass) {$\text{Tire Mass}$};&
 &
 \\
 %Row 5
@@ -88,6 +88,7 @@
 (load) edge [DataLine] (load-opt)
 (mass) edge [DataLine] (mass-opt)
 (mech) edge [DataLine] (mech-opt)
+(load) edge [DataLine] (load-mech)
 (opt) edge [DataLine] (left_output_opt)
 % Vertical edges
 (opt-solver) edge [DataLine] (solver)
@@ -97,6 +98,7 @@
 (load-opt) edge [DataLine] (opt)
 (mass-opt) edge [DataLine] (opt)
 (mech-opt) edge [DataLine] (opt)
+(load-mech) edge [DataLine] (mech)
 (opt) edge [DataLine] (output_opt);
 \end{pgfonlayer}
 
