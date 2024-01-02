@@ -251,14 +251,20 @@ Tire Performance:
         
         return P + X * Pc + 3 
     
-    def mech_feasibility(self, brake_load=332.0, alpha=45.0, phi=90.0) -> Tuple[int, int]: 
+    def mech_feasibility(self, brake_load=338.0, alpha=45.0, phi=90.0) -> Tuple[int, int]: 
         brake_load /= constants.lbf 
-        for i in range(1, int(self.PR/2)+1): 
+        if self.PR < 8: 
+            N = constants.pi * self.inflation_pressure() / brake_load * (
+                (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
+            ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180)
+            if N <= 1540: 
+                return int(N) + 1, 1
+        for i in range(1, int(self.PR/8)+1): 
             N = constants.pi * self.inflation_pressure() / brake_load * (
                 (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
             ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) / i 
 
-            if N <= 330: 
+            if N <= 1540: 
                 return int(N)+1, i
             # if N < 705: 
             #     N = constants.pi * self.inflation_pressure() / brake_load * (
@@ -272,6 +278,12 @@ Tire Performance:
         # ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) 
         # t *= constants.lbf 
         # return brake_load / t 
+        
+        # N = constants.pi * self.inflation_pressure() / brake_load * (
+        #     (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
+        # ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) / max(int(self.PR / 8), 1)
+        # return N, max(int(self.PR / 8), 1)
+    
         return -1, -1 
 
 
