@@ -251,15 +251,15 @@ Tire Performance:
         
         return P + X * Pc + 3 
 
-    def is_mech_feasible(self, N=330, n_ply=0, break_load=332.0, alpha=30.0, phi=90.0) -> bool: 
+    def is_mech_feasible(self, N=1540, n_ply=0, break_load=338.0, alpha=30.0, phi=90.0) -> bool: 
         """Compare if the required load exceeds the designed brake load of the material. 
         
         Args:
-            N (int, optional): number of fibres per cord. Defaults to 330.
+            N (int, optional): number of fibres per cord. Defaults to 1540.
             n_ply (int, optional): number of plies. Defaults to 0 when 
                 half of ply rating is used. 
             break_load (float, optional): material designed breaking load in N. 
-                Defaults to 332.0.
+                Defaults to 338.0.
             alpha (float, optional): cord angle in degrees. Defaults to 30.0.
             phi (float, optional): angle between $\Delta s$ tangent line and 
                 the tire meridian line in degree. Defaults to 90.0.
@@ -274,13 +274,13 @@ Tire Performance:
         else: 
             return False 
     
-    def fiber_tension(self, N=330, n_ply=0, alpha=30.0, phi=90.0) -> float: 
+    def fiber_tension(self, N=1540, n_ply=0, alpha=30.0, phi=90.0) -> float: 
         """Calculate the tension each tire reinforcement cord needs to sustain
 
         $t = pi / P / N * ({\rho}^2 - {\rho_m}^2) / \sin(\alpha) / \sin(\phi)$
         
         Args:
-            N (int, optional): number of fibres per cord. Defaults to 330.
+            N (int, optional): number of fibres per cord. Defaults to 1540.
             n_ply (int, optional): number of plies. Defaults to 0 when 
                 half of ply rating is used. 
             alpha (float, optional): cord angle in degrees. Defaults to 30.0.
@@ -291,9 +291,9 @@ Tire Performance:
             float: fiber tension in N 
         """
         if not n_ply: 
-            n_ply = self.PR / 2
+            n_ply = self.PR / 8
             
-        t = np.pi * self.inflation_pressure() / (N * self.PR/2) * (
+        t = np.pi * self.inflation_pressure() / (N * n_ply) * (
             (self.Dm/2) ** 2 - (self.Dm/2 - (self.Dm - self.D)/4) ** 2
         ) / np.sin(alpha * np.pi / 180) / np.sin(phi * np.pi / 180) 
         

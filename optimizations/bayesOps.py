@@ -252,29 +252,17 @@ if __name__ == "__main__":
         "PR": (4, 38)
     }
 
-    # tire = bayesOps_opt(
-    #     36000, 0, scopes, init_points=10, n_iter=200, util_kind='ucb', 
-    #     util_kappa=6, util_kappa_decay=0.8, util_kappa_decay_delay=50, 
-    #     verbose=0
-    # )
-    # print(tire)
-    
-    # tire = bayesOps_opt(
-    #     36000, 0, scopes, init_points=10, n_iter=100, util_kind='ei', 
-    #     util_xi=0.02, verbose=0
-    # )
-    # print(tire)
-    
-    # tire = bayesOps_opt(
-    #     36000, 0, scopes, init_points=10, n_iter=100, util_kind='poi', 
-    #     util_xi=0.04, verbose=0
-    # )
-    # print(tire)
-    
-    np.random.seed(80)
-    opt, eff = eval_bayes(
-        scopes, 10, 100, util_kind='ucb', util_kappa=3, util_kappa_decay=0.95, 
-        util_kappa_decay_delay=30
+    tire = bayesOps_opt(
+        36000, 0, scopes, init_points=50, n_iter=150, util_kind='ucb', 
+        util_kappa=3, util_kappa_decay=0.95, util_kappa_decay_delay=100, 
+        verbose=0
     )
-    print("Optimality: {}, efficiency: {}".format(opt, eff))
+    print(tire)
+    
+    # np.random.seed(80)
+    # opt, eff = eval_bayes(
+    #     scopes, 50, 150, util_kind='ucb', util_kappa=3, util_kappa_decay=0.95, 
+    #     util_kappa_decay_delay=100
+    # )
+    # print("Optimality: {}, efficiency: {}".format(opt, eff))
     
