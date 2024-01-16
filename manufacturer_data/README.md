@@ -1,15 +1,19 @@
 # Manufacturer Data 
 
-To test and validate our program, we retrieved aircraft tire engineering data from Michelin Aircraft Tire. 
+To test and validate our program, we retrieved aircraft tire engineering data from Michelin and Goodyear. 
 
 Specifically, we focused on two types of tires: 
-- [Bias type VII tires, presented with the three part (inch code) nomenclature](#bias-type-vii--three-part-inch-code)
-- [Radial civil tires, presented with the three part (inch code) nomenclature](#radial-civil-three-part-inch-code)
+- For [Michelin Aircraft Tire](#michelin-aircraft-tire): 
+    - [Bias type VII tires, presented with the three part (inch code) nomenclature](#bias-type-vii--three-part-inch-code)
+    - [Radial civil tires, presented with the three part (inch code) nomenclature](#radial-civil-three-part-inch-code)
+- For [Goodyear Aircraft Tire](#goodyear-aircraft-tire): 
+    - [Bias type VII tires](#bias-type-vii)
 
 All nomenclatures are also explained with dimensions shown on the cross-sectional plot of an inflated tire [below](#inflated-tire-dimensions-at-rated-tire-pressure). 
 
-## Bias Type VII + Three Part (Inch Code)
-The file `bias_tire_data.csv` is prepared with column names using the "Notation" column from the table below. 
+## Michelin Aircraft Tire 
+### Bias Type VII + Three Part (Inch Code)
+The file `michelin_bias.csv` is prepared with column names using the "Notation" column from the table below. 
 
 | Category | Name | Unit | Notation | 
 | :------- |:---- | :--- | :------- | 
@@ -43,8 +47,8 @@ Notes:
 - The Three Part Nomenclature in tire descriptions may contain a prefix designation by B, C, H, or *. 
 - \* in tire description prefix: this dimensional data for this size was defined in metric units which, for consistency, has been converted to english units.
 
-## Radial Civil Three Part (Inch Code)
-The file `radial_tire_data.csv` is prepared with column names using the "Notation" column from the table below. 
+### Radial Civil Three Part (Inch Code)
+The file `michelin_radial.csv` is prepared with column names using the "Notation" column from the table below. 
 
 | Category | Name | Unit | Notation | 
 | :------- |:---- | :--- | :------- | 
@@ -69,6 +73,42 @@ The file `radial_tire_data.csv` is prepared with column names using the "Notatio
 | | Min. Ledge Width | in. | G |
 | | Outer Flange Diameter ($D_F$) | in. | DF |
 | Qualification Standard | | | QS |
+| | | | |
+
+## Goodyear Aircraft Tire 
+### Bias Type VII 
+The file `goodyear_bias.csv` is prepared with column names using the "Notation" column from the table below. 
+
+| Category | Name | Unit | Notation | 
+| :------- |:---- | :--- | :------- | 
+| Size | Nominal Overall Diameter | in. | M |
+| | Nominal Section Width | in. | N |
+| Construction | Ply Rating | | PR |
+| | TT or TL | | TT/TL | 
+| | Rated Speed | mph (or knot if otherwise specified with "K") | SI |
+| Service Rating | Rated Loading | lbs | Lm |
+| | Rated Inflation | psi | IP |
+| | Max. Breaking Load | lbs | RL |
+| | Max. Bottoming Load | lbs | BL |
+| Tread Design/ Trademark | | | TD |
+| Part No. | | | PRT |
+| Weight | | lbs | WGT | 
+| Inflated Dimensions | Outside Dia Max. | in. | DoMax|
+| | Outside Dia Min. | in. | DoMin |
+| | Section Width Max. | in. | WMax |
+| | Section Width Min. | in. | WMin |
+| | Shoulder Dia Max. | in. | DsMax |
+| | Shoulder Width Max. | in. | WsMax |
+| Static Loaded Radius | | in. | LR_RL |
+| Flat Tire Radius | | in. | LR_BL |
+| Aspect Ratio | | | AR |
+| Wheel | Wheel Size | in. | WS |
+| | Width Between Flanges | in. | A |
+| | Specified Rim Diameter | in. | RD |
+| | Flange Height ($F_H$) | in. | FH |
+| | Min. Ledge Width | in. | G |
+| Aircraft Manufacturer | | | AM |
+| Qualification Spec | | | QS |
 | | | | |
 
 ## Inflated tire dimensions (at rated tire pressure)

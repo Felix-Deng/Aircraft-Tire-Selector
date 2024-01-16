@@ -9,6 +9,7 @@ This program automatically processes key aircraft design requirements (load inpu
   |-- _methods.py: import models.py from root directory 
   |-- model_eval.py: calculate difference between calculated and provided values 
   |-- eval_analysis.py: analysis of the evaluating results from model_eval.py 
+  |-- tire_mass.py: find correlation between tire mass and mass of inflation medium 
 - /optimizations: store all alternative optimization methods used, evaluated with optimization on bias tires only 
   |-- _models.py: import models.py from root directory 
   |-- bayesOps.py: Bayesian optimization method 
