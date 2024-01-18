@@ -18,7 +18,7 @@ with open("manufacturer_data/bias_tire_data.csv") as data_csv:
                 row + [
                     'Databook Lm', 'Rounded Calc Lm', 'Exact Calc Lm', 
                     'Databook Inflation Pressure', 'Calculated Inflation Pressure', 
-                    'Number of Fibres', 'Number of Plies', 'Ply Rating'
+                    'Number of Fibres', 'Number of Plies', 'Ply Rating', "Tension"
                 ]
             )
             continue 
@@ -51,13 +51,13 @@ with open("manufacturer_data/bias_tire_data.csv") as data_csv:
             
             calc_IP = tire.inflation_pressure() 
             
-            n_fibre, n_ply = tire.mech_feasibility()
+            n_fibre, n_ply, tension = tire.mech_feasibility()
             
             calc_result.append(row + [
-                tire.Lm, rounded_Lm, exact_Lm, tire.IP, calc_IP, n_fibre, n_ply, tire.PR
+                tire.Lm, rounded_Lm, exact_Lm, tire.IP, calc_IP, n_fibre, n_ply, tire.PR, tension
             ])
         else:
-            calc_result.append(row + [0, 0, 0, 0, 0, 0, 0, 0])
+            calc_result.append(row + [0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 # Save the calculated Lm to a new CSV to compare with given manufacturer values 
 with open("manufacturer_data/mech_eval.csv", "w") as out_csv: 

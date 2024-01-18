@@ -258,14 +258,20 @@ Tire Performance:
                 (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
             ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180)
             if N <= 1540: 
-                return int(N) + 1, 1
+                t = constants.pi * self.inflation_pressure() / (int(N)+1) * (
+                    (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
+                ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) * constants.lbf
+                return int(N) + 1, 1, t
         for i in range(1, int(self.PR/8)+1): 
             N = constants.pi * self.inflation_pressure() / brake_load * (
                 (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
             ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) / i 
 
             if N <= 1540: 
-                return int(N)+1, i
+                t = constants.pi * self.inflation_pressure() / (int(N)+1) / i * (
+                    (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
+                ) / np.sin(alpha * constants.pi / 180) / np.sin(phi * constants.pi / 180) * constants.lbf
+                return int(N)+1, i, t
             # if N < 705: 
             #     N = constants.pi * self.inflation_pressure() / brake_load * (
             #         (self.Dm/2)**2 - (self.Dm/2 - (self.Dm-self.D)/4)**2
