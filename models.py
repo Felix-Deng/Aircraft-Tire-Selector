@@ -298,6 +298,27 @@ Tire Performance:
         ) / np.sin(alpha * np.pi / 180) / np.sin(phi * np.pi / 180) 
         
         return t * constants.lbf
+    def walter_fiber_count(self, beta_c = 30.0, m_1 = 1200.00, rho = 1.00, beta_s = 45.00, T = 75.9854) -> float:
+        """Calculate the fiber count using formula form walter's paper
+
+        Args:
+            beta_c (float, optional): angle between the cord and a meridian plane at the crown of the tire. Defaults to 30.0 deg.
+            m_1 (float, optional):average (constant) mass of rubber and cord per unit area of tire surface in the 
+                                interval between the crown and shoulder Defaults to 1200.00.
+            rho (float, optional):dimensionless radial coordinate (r/r_c). Defaults to 1.00.
+            beta_s (float, optional): angle between the cord and a meridian plane at the shoulder Defaults to 40.00 deg.
+            T (float, optional): cord tension Defaults to 338.00 N = 75.9854 lbf.
+
+        Returns:
+            fiber counts = N/ply count
+        """
+        r_c = self.Dm/2
+        r_w = self.Dm/2 - (self.Dm-self.D)/4
+        rho_w = r_w/r_c
+        N = np.pi * self.inflation_pressure() * (r_c**2)  * (1 - rho_w**2) * np.cos(beta_c * np.pi / 180) / (T * (1 - rho**2 * (np.sin(beta_s*np.pi / 180))**2))
+        fiber_counts = N / (self.PR/8)
+        return fiber_counts
+
 
 
 if __name__ == "__main__": 
