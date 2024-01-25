@@ -251,31 +251,36 @@ Tire Performance:
         
         return P + X * Pc + 3 
 
-    def is_mech_feasible(self, N=1540, n_ply=0, break_load=338.0, alpha=30.0, phi=90.0) -> bool: 
+    def is_mech_feasible(self, model="walter", N=1540, n_ply=0, break_load=338.0) -> bool: 
         """Compare if the required load exceeds the designed brake load of the material. 
         
         Args:
+            model (str, optional): type of model in {"walter", "netting"}. 
+                Defaults to "walter". 
             N (int, optional): number of fibres per cord. Defaults to 1540.
             n_ply (int, optional): number of plies. Defaults to 0 when 
                 half of ply rating is used. 
             break_load (float, optional): material designed breaking load in N. 
                 Defaults to 338.0.
-            alpha (float, optional): cord angle in degrees. Defaults to 30.0.
-            phi (float, optional): angle between $\Delta s$ tangent line and 
-                the tire meridian line in degree. Defaults to 90.0.
 
         Returns:
             bool: if the tire is mechanically feasible based on cord strength 
         """
-        t = self.fiber_tension(N, n_ply, alpha, phi)
+        if model == "walter": 
+            t = self.fiber_tension_walter(N=N, n_ply=n_ply)
+        elif model == "netting": 
+            t = self.fiber_tension_netting(N=N, n_ply=n_ply)
+        else: 
+            raise ValueError("Unsupported model type. Currently only support {\"walter\", \"netting\"}")
         
         if t < break_load: # comparison made in N 
             return True 
         else: 
             return False 
     
-    def fiber_tension(self, N=1540, n_ply=0, alpha=30.0, phi=90.0) -> float: 
-        """Calculate the tension each tire reinforcement cord needs to sustain
+    def fiber_tension_netting(self, N=1540, n_ply=0, alpha=30.0, phi=90.0) -> float: 
+        """Calculate the tension each tire reinforcement cord needs to sustain using 
+        the netting model. 
 
         $t = pi / P / N * ({\rho}^2 - {\rho_m}^2) / \sin(\alpha) / \sin(\phi)$
         
@@ -297,6 +302,35 @@ Tire Performance:
             (self.Dm/2) ** 2 - (self.Dm/2 - (self.Dm - self.D)/4) ** 2
         ) / np.sin(alpha * np.pi / 180) / np.sin(phi * np.pi / 180) 
         
+        return t * constants.lbf
+    
+    def fiber_tension_walter(self, N=1583, n_ply=0, beta_c=30., rho=1.00, beta_s=45.00) -> float: 
+        """Calculate the tension each tire reinforcement cord needs to sustain using 
+        the Walter model, which combines the netting model and the shell model to 
+        include both static loading and centrifugal force from dynamic tire rotation. 
+
+        Args:
+            N (int, optional): number of fibers per cord. Defaults to 1583.
+            n_ply (int, optional): actual number of plies used. Defaults to 0.
+            beta_c (_type_, optional): angle (in degree) between the cord and a meridian 
+                plane at the crown of the tire. Defaults to 30..
+            rho (float, optional): dimensionless radial coordinate (r/r_c). Defaults to 1.00.
+            beta_s (float, optional): angle (in degree) between the cord and a meridian 
+                plane at the shoulder. Defaults to 45.00.
+
+        Returns:
+            float: fiber tension in N 
+        """
+        if not n_ply: 
+            n_ply = self.PR / 8 
+        
+        r_c = self.Dm / 2 
+        r_w = self.Dm / 2 - (self.Dm - self.D) / 4
+        rho_w = r_w / r_c 
+        
+        t = np.pi * self.inflation_pressure() * (r_c ** 2) * (1 - rho_w ** 2) * np.cos(beta_c * np.pi / 180) / (
+            N * n_ply * (1 - rho ** 2 * (np.sin(beta_s * np.pi / 180) ** 2))
+        )
         return t * constants.lbf
 
 

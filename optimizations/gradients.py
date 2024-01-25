@@ -119,7 +119,7 @@ def _gradients_opt(
             PR = inputs['PR']
             
             tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
-            outputs['fiber_tension'] = tire.fiber_tension()
+            outputs['fiber_tension'] = tire.fiber_tension_walter()
             
 
     class TireMDA(om.Group): 
