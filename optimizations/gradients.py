@@ -23,7 +23,7 @@ from selector import search_databook
 
 def _gradients_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', fiber_break_load=332.0, reports=False, disp=False 
+    optimizer: str='SLSQP', fiber_break_load=332.0, reports=False, disp=False, record=False  
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -38,6 +38,7 @@ def _gradients_opt(
                 Defaults to 332.0.
         reports (bool, optional): should reports be auto generated? Defaults to False.
         disp (bool, optional): should convergence messages be printed? Defaults to False. 
+        record (bool, optional): should iteration history be recorded? Defaults to False. 
 
     Returns:
         Optional[Tire]: the optimized tire design 
@@ -185,9 +186,16 @@ def _gradients_opt(
     prob.model.add_constraint('fiber_tension', upper=fiber_break_load)
     prob.model.approx_totals() 
     
+    if record: 
+        recorder = om.SqliteRecorder('cases.sql') 
+        prob.driver.add_recorder(recorder)
+    
     prob.setup() 
     prob.set_solver_print(level=-1)
     fail_fag = prob.run_driver() 
+    
+    if record: 
+        prob.record('solver_history')
     
     if fail_fag: 
         return None 
@@ -203,7 +211,7 @@ def _gradients_opt(
 
 def gradients_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', reports=False, disp=False 
+    optimizer: str='SLSQP', reports=False, disp=False, record=False 
 ) -> Tire: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -216,6 +224,7 @@ def gradients_opt(
         optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
         reports (bool, optional): should reports be auto generated? Defaults to False.
         disp (bool, optional): should convergence messages be printed? Defaults to False. 
+        record (bool, optional): should iteration history be recorded? Defaults to False. 
 
     Returns:
         Tire: the optimized tire design 
@@ -226,7 +235,7 @@ def gradients_opt(
         counter += 1
         if counter > 1: 
             print("openMDAO optimization failed to return a valid tire design. Starting attempt number {} ...".format(counter))
-        tire = _gradients_opt(req_Lm, speed_index, scopes, optimizer, reports=reports, disp=disp)
+        tire = _gradients_opt(req_Lm, speed_index, scopes, optimizer, reports=reports, disp=disp, record=record)
         req_Lm += 1
     return tire 
         
@@ -319,4 +328,19 @@ if __name__ == "__main__":
     # opt, eff = eval_gradients_opt(scopes, optimizer='SLSQP')
     # print("Optimality: {}, efficiency: {}".format(opt, eff))
     
-    
+    ####### For tracking optimization history #######
+    # tire = gradients_opt(36000, 0, scopes, optimizer='SLSQP', disp=True, record=True)
+    # cr = om.CaseReader("cases.sql")
+    # driver_cases = cr.get_cases('driver', recurse=False)
+
+    # Dm_hist = [] 
+    # Wm_hist = [] 
+    # D_hist = [] 
+    # DF_hist = [] 
+    # PR_hist = [] 
+    # for case in driver_cases: 
+    #     Dm_hist.append(case['Dm'])
+    #     Wm_hist.append(case['Wm'])
+    #     D_hist.append(case['D'])
+    #     DF_hist.append(case['DF'])
+    #     PR_hist.append(case['PR'])
