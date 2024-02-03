@@ -64,6 +64,6 @@ with open("manufacturer_data/michelin_bias.csv") as data_csv:
             calc_result.append(row + [0, 0, 'N/A', 'N/A', 'No enough info'] + [0] * 5)
 
 # Save the calculated Lm to a new CSV to compare with given manufacturer values 
-with open("manufacturer_data/mech_eval.csv", "w") as out_csv: 
+with open("manufacturer_data/mech_eval_michelin.csv", "w") as out_csv: 
     csv_writer = csv.writer(out_csv)
     csv_writer.writerows(calc_result)
