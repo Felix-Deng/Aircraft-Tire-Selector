@@ -19,7 +19,9 @@ with open("manufacturer_data/michelin_bias.csv") as data_csv:
                 row + [
                     'Rounded Calc Lm', 'Exact Calc Lm', 
                     'Rounded Lm Relative Difference', 
-                    'Absolute Relative Difference', 'Comment', 'Fiber Count'
+                    'Absolute Relative Difference', 'Comment'
+                ] + [
+                    "Fiber (rho={})".format(i) for i in np.linspace(0.85, 0.95, 5)
                 ]
             )
             continue 
@@ -56,10 +58,10 @@ with open("manufacturer_data/michelin_bias.csv") as data_csv:
                 comment = 'Lr = {}, Lm to be comfirmed'.format(tire.Lr)
             else:
                 comment = ''
-            fiber = tire.walter_fiber_count()
-            calc_result.append(row + [rounded_Lm, exact_Lm, diff_ratio, abs_diff_ratio, comment, fiber])
+            fiber = [tire.walter_fiber_count(prho=i) for i in np.linspace(0.85, 0.95, 5)]
+            calc_result.append(row + [rounded_Lm, exact_Lm, diff_ratio, abs_diff_ratio, comment] + fiber)
         else:
-            calc_result.append(row + [0, 0, 'N/A', 'N/A', 'No enough info', 0])
+            calc_result.append(row + [0, 0, 'N/A', 'N/A', 'No enough info'] + [0] * 5)
 
 # Save the calculated Lm to a new CSV to compare with given manufacturer values 
 with open("manufacturer_data/mech_eval.csv", "w") as out_csv: 
