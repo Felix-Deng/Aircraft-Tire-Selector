@@ -298,14 +298,14 @@ Tire Performance:
         ) / np.sin(alpha * np.pi / 180) / np.sin(phi * np.pi / 180) 
         
         return t * constants.lbf
-    def walter_fiber_count(self, beta_c = 30.0, m_1 = 0.000071, rho = 1.00, beta_s = 45.00, T = 75.9854, prho=0.92) -> float:
+    def walter_fiber_count(self, beta_c = 30.0, m_1 = 0.000071, beta_s = 45.00, T = 75.9854, prho=0.92) -> float:
         """Calculate the fiber count using formula form walter's paper
 
         Args:
             beta_c (float, optional): angle between the cord and a meridian plane at the crown of the tire. Defaults to 30.0 deg.
             m_1 (float, optional):average (constant) mass of rubber and cord per unit area of tire surface in the 
                                 interval between the crown and shoulder Defaults to 1200.00.
-            rho (float, optional):dimensionless radial coordinate (r/r_c). Defaults to 1.00.
+            prho (float, optional):dimensionless radial coordinate (r/r_c). Defaults to 1.00.
             beta_s (float, optional): angle between the cord and a meridian plane at the shoulder Defaults to 40.00 deg.
             T (float, optional): cord tension Defaults to 338.00 N = 75.9854 lbf.
 
@@ -319,7 +319,7 @@ Tire Performance:
         Psi_1 = (2*(1 - np.sin(beta_c * np.pi / 180)**2)**(2/3) - (1- np.sin(beta_c * np.pi / 180)**2)**(0.5) - np.arcsin(np.sin(beta_c*np.pi / 180))/np.sin(beta_c*np.pi / 180))/(4*np.sin(beta_c*np.pi / 180)**2)
         angular_velocity = (self.SI)*17.6/r_c
         OMEGA = (r_c*angular_velocity**2)/(self.inflation_pressure())
-        N = np.pi * self.inflation_pressure() * (r_c**2)  *( (1 - rho_w**2) * np.cos(beta_c * np.pi / 180) + m_1*OMEGA*(Psi_rho-Psi_1)) / (T * (1 - rho**2 * (np.sin(beta_s*np.pi / 180))**2))
+        N = np.pi * self.inflation_pressure() * (r_c**2)  *( (1 - rho_w**2) * np.cos(beta_c * np.pi / 180) + m_1*OMEGA*(Psi_rho-Psi_1)) / (T * (1 - prho**2 * (np.sin(beta_s*np.pi / 180))**2))
         fiber_counts = N / np.ceil(self.PR/8)
         return fiber_counts
 
