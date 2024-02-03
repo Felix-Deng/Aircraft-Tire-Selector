@@ -296,15 +296,15 @@ Tire Performance:
             float: fiber tension in N 
         """
         if not n_ply: 
-            n_ply = self.PR / 8
+            n_ply = np.ceil(self.PR / 8)
             
         t = np.pi * self.inflation_pressure() / (N * n_ply) * (
             (self.Dm/2) ** 2 - (self.Dm/2 - (self.Dm - self.D)/4) ** 2
-        ) / np.sin(alpha * np.pi / 180) / np.sin(phi * np.pi / 180) 
+        ) / np.sin(alpha * constants.degree) / np.sin(phi * constants.degree) 
         
         return t * constants.lbf
     
-    def fiber_tension_walter(self, N=1583, n_ply=0, beta_c=30., rho=1.00, beta_s=45.00) -> float: 
+    def fiber_tension_walter(self, N=1583, n_ply=0, beta_c=30.0, m_1= 71e-6, rho=0.92, beta_s=45.00) -> float: 
         """Calculate the tension each tire reinforcement cord needs to sustain using 
         the Walter model, which combines the netting model and the shell model to 
         include both static loading and centrifugal force from dynamic tire rotation. 
@@ -312,8 +312,11 @@ Tire Performance:
         Args:
             N (int, optional): number of fibers per cord. Defaults to 1583.
             n_ply (int, optional): actual number of plies used. Defaults to 0.
-            beta_c (_type_, optional): angle (in degree) between the cord and a meridian 
-                plane at the crown of the tire. Defaults to 30..
+            beta_c (float, optional): angle (in degree) between the cord and a meridian 
+                plane at the crown of the tire. Defaults to 30.0.
+            m_1 (float, optional): average (constant) mass of rubber and cord per unit area 
+                of tire surface in the interval between the crown and shoulder (in lb.sec^2/in^3). 
+                Defaults to 71e-6. 
             rho (float, optional): dimensionless radial coordinate (r/r_c). Defaults to 1.00.
             beta_s (float, optional): angle (in degree) between the cord and a meridian 
                 plane at the shoulder. Defaults to 45.00.
@@ -321,15 +324,36 @@ Tire Performance:
         Returns:
             float: fiber tension in N 
         """
+        def psi(_rho: float, _beta_c: float) -> float: 
+            """
+            Args:
+                _rho (float): rho in parent function 
+                _beta_c (float): beta_c in parent function (in radian)
+
+            Returns:
+                float: psi(rho)
+            """
+            return (
+                2 * _rho * (1 - _rho**2 * np.sin(_beta_c)**2) ** (2/3) - 
+                _rho * (1 - _rho**2 * np.sin(_beta_c)**2) ** (1/2) - 
+                np.arcsin(_rho * np.sin(_beta_c)) / np.sin(_beta_c)
+            ) / (4 * np.sin(_beta_c)**2)
+        
         if not n_ply: 
-            n_ply = self.PR / 8 
+            n_ply = np.ceil(self.PR / 8)
         
-        r_c = self.Dm / 2 
-        r_w = self.Dm / 2 - (self.Dm - self.D) / 4
+        beta_c *= constants.degree
+        beta_s *= constants.degree
+        r_c = self.Dm / 2 # radial distance from axis of revolution to crown 
+        r_w = self.Dm / 2 - (self.Dm - self.D) / 4 # radial distance from axis of revolution to widest part of tire meridian 
         rho_w = r_w / r_c 
+        omega = self.SI * (constants.mile / constants.inch / constants.hour) / r_c # angular velocity 
+        Omega = r_c * (omega) ** 2 / self.inflation_pressure() # geometry and load parameter 
         
-        t = np.pi * self.inflation_pressure() * (r_c ** 2) * (1 - rho_w ** 2) * np.cos(beta_c * np.pi / 180) / (
-            N * n_ply * (1 - rho ** 2 * (np.sin(beta_s * np.pi / 180) ** 2))
+        t = np.pi * self.inflation_pressure() * (r_c ** 2) * (
+            (1 - rho_w**2) * np.cos(beta_c) + m_1 * Omega * (psi(rho) - psi(1))
+        ) / (
+            N * n_ply * (1 - rho ** 2 * (np.sin(beta_s) ** 2))
         )
         return t * constants.lbf
 
@@ -353,5 +377,5 @@ if __name__ == "__main__":
         + '\nMass of tire\'s inflation medium:\n'\
         + f'With databook pressure: {round(tire.inflation_medium_mass(), 2)} kg\n'\
         + f'With calculated pressure: {round(tire.inflation_medium_mass(P_gas=tire.IP), 2)} kg'
-        + f'\nFiber tension: {tire.fiber_tension()} N'
     )
+    
