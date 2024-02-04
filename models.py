@@ -70,10 +70,10 @@ Tire Design Parameters:
 - DF: {self.DF} in
 - PR: {self.PR} in
 Tire Performance: 
-- Lm (databook): {self.Lm} lbs
-- Lm (analytical): {round(self.max_load_capacity(exact=True), 4)} lbs
-- Mass: {round(self.inflation_medium_mass(), 4)} kg
+- Lm (analytical): {self.max_load_capacity(exact=True)} lbs
+- Mass of Inflation Medium: {round(self.inflation_medium_mass(), 4)} kg
 - Speed Index: {self.SI} mph
+- Aspect Ratio: {self.aspect_ratio()}
 {'*'*20}'''
     
     def __eq__(self, other: object) -> bool:
@@ -251,13 +251,14 @@ Tire Performance:
         
         return P + X * Pc + 3 
 
-    def is_mech_feasible(self, model="walter", N=1540, n_ply=0, break_load=338.0) -> bool: 
+    def is_mech_feasible(self, model="walter", N=0, n_ply=0, break_load=338.0) -> bool: 
         """Compare if the required load exceeds the designed brake load of the material. 
         
         Args:
             model (str, optional): type of model in {"walter", "netting"}. 
                 Defaults to "walter". 
-            N (int, optional): number of fibres per cord. Defaults to 1540.
+            N (int, optional): number of cords per ply. Defaults to 0 when 
+                tested maximum allowable number from manufacturer is used.
             n_ply (int, optional): number of plies. Defaults to 0 when 
                 half of ply rating is used. 
             break_load (float, optional): material designed breaking load in N. 
@@ -267,9 +268,9 @@ Tire Performance:
             bool: if the tire is mechanically feasible based on cord strength 
         """
         if model == "walter": 
-            t = self.fiber_tension_walter(N=N, n_ply=n_ply)
+            t = self.cord_tension_walter(N=N, n_ply=n_ply)
         elif model == "netting": 
-            t = self.fiber_tension_netting(N=N, n_ply=n_ply)
+            t = self.cord_tension_netting(N=N, n_ply=n_ply)
         else: 
             raise ValueError("Unsupported model type. Currently only support {\"walter\", \"netting\"}")
         
@@ -278,14 +279,15 @@ Tire Performance:
         else: 
             return False 
     
-    def fiber_tension_netting(self, N=1540, n_ply=0, alpha=30.0, phi=90.0) -> float: 
+    def cord_tension_netting(self, N=0, n_ply=0, alpha=30.0, phi=90.0) -> float: 
         """Calculate the tension each tire reinforcement cord needs to sustain using 
         the netting model. 
 
         $t = pi / P / N * ({\rho}^2 - {\rho_m}^2) / \sin(\alpha) / \sin(\phi)$
         
         Args:
-            N (int, optional): number of fibres per cord. Defaults to 1540.
+            N (int, optional): number of cords per ply. Defaults to 0 when 
+                tested maximum allowable number from manufacturer is used.
             n_ply (int, optional): number of plies. Defaults to 0 when 
                 half of ply rating is used. 
             alpha (float, optional): cord angle in degrees. Defaults to 30.0.
@@ -297,6 +299,8 @@ Tire Performance:
         """
         if not n_ply: 
             n_ply = np.ceil(self.PR / 8)
+        if not N: 
+            N = 1540
             
         t = np.pi * self.inflation_pressure() / (N * n_ply) * (
             (self.Dm/2) ** 2 - (self.Dm/2 - (self.Dm - self.D)/4) ** 2
@@ -304,20 +308,21 @@ Tire Performance:
         
         return t * constants.lbf
     
-    def fiber_tension_walter(self, N=1583, n_ply=0, beta_c=30.0, m_1= 71e-6, rho=0.92, beta_s=45.00) -> float: 
+    def cord_tension_walter(self, N=0, n_ply=0, beta_c=30.0, m_1= 71e-6, rho=0.9, beta_s=45.00) -> float: 
         """Calculate the tension each tire reinforcement cord needs to sustain using 
         the Walter model, which combines the netting model and the shell model to 
         include both static loading and centrifugal force from dynamic tire rotation. 
 
         Args:
-            N (int, optional): number of fibers per cord. Defaults to 1583.
+            N (int, optional): number of cords per ply. Defaults to 0 when 
+                tested maximum allowable number from manufacturer is used.
             n_ply (int, optional): actual number of plies used. Defaults to 0.
             beta_c (float, optional): angle (in degree) between the cord and a meridian 
                 plane at the crown of the tire. Defaults to 30.0.
             m_1 (float, optional): average (constant) mass of rubber and cord per unit area 
                 of tire surface in the interval between the crown and shoulder (in lb.sec^2/in^3). 
                 Defaults to 71e-6. 
-            rho (float, optional): dimensionless radial coordinate (r/r_c). Defaults to 1.00.
+            rho (float, optional): dimensionless radial coordinate (r/r_c). Defaults to 0.9.
             beta_s (float, optional): angle (in degree) between the cord and a meridian 
                 plane at the shoulder. Defaults to 45.00.
 
@@ -341,6 +346,8 @@ Tire Performance:
         
         if not n_ply: 
             n_ply = np.ceil(self.PR / 8)
+        if not N: 
+            N = 1360 
         
         beta_c *= constants.degree
         beta_s *= constants.degree
@@ -351,7 +358,7 @@ Tire Performance:
         Omega = r_c * (omega) ** 2 / self.inflation_pressure() # geometry and load parameter 
         
         t = np.pi * self.inflation_pressure() * (r_c ** 2) * (
-            (1 - rho_w**2) * np.cos(beta_c) + m_1 * Omega * (psi(rho) - psi(1))
+            (1 - rho_w**2) * np.cos(beta_c) + m_1 * Omega * (psi(rho, beta_c) - psi(1, beta_c))
         ) / (
             N * n_ply * (1 - rho ** 2 * (np.sin(beta_s) ** 2))
         )
@@ -365,7 +372,6 @@ if __name__ == "__main__":
         WMax=7.20, WMin=6.80, DsMax=19.25, WsMax=6.35, AR=0.78, LR_RL=9, LR_BL=6.8, A=5.50, RD=10,
         FH=1, G=1.4, DF=12, QS='TSO-C62'
     )
-    tire = Tire(PR=28, Dm=43, Wm=16, D=20, DF=23.5)
     print(
         'Maximum load capacity of the tire:\n'\
         + f'From databook: {tire.Lm} lbs\n'\
@@ -376,6 +382,9 @@ if __name__ == "__main__":
         + f'From calculation: {round(tire.inflation_pressure(), 2)} psi\n'\
         + '\nMass of tire\'s inflation medium:\n'\
         + f'With databook pressure: {round(tire.inflation_medium_mass(), 2)} kg\n'\
-        + f'With calculated pressure: {round(tire.inflation_medium_mass(P_gas=tire.IP), 2)} kg'
+        + f'With calculated pressure: {round(tire.inflation_medium_mass(P_gas=tire.IP), 2)} kg\n'\
+        + '\nReinforcement cord tension:\n'\
+        + f'With Netting model: {tire.cord_tension_netting()} N\n'\
+        + f'With Walter model: {tire.cord_tension_walter()} N'
     )
     

@@ -69,7 +69,7 @@ def _gradients_opt(
             DF = inputs['DF']
             PR = inputs['PR']
             
-            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
+            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF, SI=speed_index)
             outputs['Lm'] = tire.max_load_capacity(exact=True)
 
     class GasMass(om.ExplicitComponent): 
@@ -94,7 +94,7 @@ def _gradients_opt(
             DF = inputs['DF']
             PR = inputs['PR']
             
-            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
+            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF, SI=speed_index)
             outputs['mass'] = tire.inflation_medium_mass()
             
     class MechFeasibility(om.ExplicitComponent): 
@@ -119,8 +119,8 @@ def _gradients_opt(
             DF = inputs['DF']
             PR = inputs['PR']
             
-            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF)
-            outputs['fiber_tension'] = tire.fiber_tension_walter()
+            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF, SI=speed_index)
+            outputs['fiber_tension'] = tire.cord_tension_walter()
             
 
     class TireMDA(om.Group): 
@@ -205,7 +205,8 @@ def _gradients_opt(
         Wm=prob.get_val('Wm')[0], 
         RD=prob.get_val('D')[0], 
         DF=prob.get_val('DF')[0], 
-        PR=prob.get_val('PR')[0]
+        PR=prob.get_val('PR')[0], 
+        SI=speed_index
     )
     return tire 
 
@@ -322,7 +323,7 @@ if __name__ == "__main__":
         "DF": (5, 33), 
         "PR": (4, 38)
     }
-    tire = gradients_opt(36000, 0, scopes, optimizer='SLSQP', disp=True)
+    tire = gradients_opt(36000, 200, scopes, optimizer='SLSQP', disp=True)
     print(tire)
     
     # opt, eff = eval_gradients_opt(scopes, optimizer='SLSQP')
