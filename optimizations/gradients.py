@@ -23,7 +23,7 @@ from selector import search_databook
 
 def _gradients_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', fiber_break_load=332.0, reports=False, disp=False, record=False  
+    optimizer: str='SLSQP', fiber_break_load=338.0, reports=False, disp=False, record=False  
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -238,6 +238,8 @@ def gradients_opt(
             print("openMDAO optimization failed to return a valid tire design. Starting attempt number {} ...".format(counter))
         tire = _gradients_opt(req_Lm, speed_index, scopes, optimizer, reports=reports, disp=disp, record=record)
         req_Lm += 1
+        if counter == 10: 
+            return None 
     return tire 
         
     
@@ -325,6 +327,9 @@ if __name__ == "__main__":
     }
     tire = gradients_opt(36000, 200, scopes, optimizer='SLSQP', disp=True)
     print(tire)
+    
+    # Extreme 
+    # tire = gradients_opt(89210, 300, scopes, optimizer='SLSQP')
     
     # opt, eff = eval_gradients_opt(scopes, optimizer='SLSQP')
     # print("Optimality: {}, efficiency: {}".format(opt, eff))

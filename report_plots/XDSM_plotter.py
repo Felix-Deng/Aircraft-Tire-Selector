@@ -19,7 +19,7 @@ x.connect("mech", "opt", "\sigma_{cord}")
 x.connect("load", "mech", "P_{inflation}")
 
 x.add_input("opt", "x^{(0)}")
-# x.add_input("mech", "I_{speed}")
+x.add_input("mech", "I_{speed}")
 x.add_output("opt", "x^*", side=LEFT)
 
 x.write("mdf", outdir="./report_plots")
