@@ -18,6 +18,9 @@ pandas==2.0.3
 patsy==0.5.3
 Pillow==10.0.0
 pyparsing==3.0.9
+PyQt5==5.15.10
+PyQt5-Qt5==5.15.12
+PyQt5-sip==12.13.0
 python-dateutil==2.8.2
 pytz==2023.3
 pyXDSM==2.3.0
