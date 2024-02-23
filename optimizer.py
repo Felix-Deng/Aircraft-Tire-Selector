@@ -109,7 +109,8 @@ def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Op
 
 def _gradients_opt(
     req_Lm: float, speed_index: float, cord_break_load: float, 
-    scopes: Dict[str, Tuple[float, float, float]], tol=1e-4
+    scopes: Dict[str, Tuple[float, float, float]], 
+    aspect_ratio: Tuple[float, float], tol
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -120,7 +121,8 @@ def _gradients_opt(
         cord_break_load (float): cord material designed breaking load in N. 
         scopes (Dict[str, Tuple[float, float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[lower_bound, upper_bound, initial_guess]]
-        tol (float, optional): tolerance for termination. Defaults to 1e-4. 
+        aspect_ratio (Tuple[float, float]): min and max aspect ratio 
+        tol (float): tolerance for termination. 
         
     Returns:
         Optional[Tire]: the optimized tire design 
@@ -259,7 +261,7 @@ def _gradients_opt(
             self.add_constraint('con1', lower=0.0001)
             self.add_constraint('con2', lower=0.0001)
             self.add_constraint('con3', lower=0.0001)
-            self.add_constraint('con4', lower=0.5, upper=1.0) # TRA standard
+            self.add_constraint('con4', lower=aspect_ratio[0], upper=aspect_ratio[1]) # TRA standard
     
     prob = om.Problem(reports=False) 
     prob.model = TireMDA()
@@ -290,7 +292,8 @@ def _gradients_opt(
 
 def gradients_opt(
     req_Lm: float, speed_index: float, cord_break_load: float, 
-    scopes: Dict[str, Tuple[float, float]], tol=1e-4
+    scopes: Dict[str, Tuple[float, float]], 
+    aspect_ratio: Tuple[float, float], tol
 ) -> Tire: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -301,7 +304,8 @@ def gradients_opt(
         cord_break_load (float, optional): cord material designed breaking load in N. 
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value, initial_guess]]
-        tol (float, optional): tolerance for termination. Defaults to 1e-4. 
+        aspect_ratio (Tuple[float, float]): min and max aspect ratio 
+        tol (float): tolerance for termination. 
 
     Returns:
         Tire: the optimized tire design 
@@ -310,7 +314,7 @@ def gradients_opt(
     counter = 0 
     while not tire: 
         counter += 1
-        tire = _gradients_opt(req_Lm, speed_index, cord_break_load, scopes, tol=tol)
+        tire = _gradients_opt(req_Lm, speed_index, cord_break_load, scopes, aspect_ratio, tol)
         req_Lm += 1
         if counter == 10: 
             break 

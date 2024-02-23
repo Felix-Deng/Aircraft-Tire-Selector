@@ -57,3 +57,5 @@ ax.set_ylabel("Mass of Tire Inflation Medium [lbs]")
 
 plt.tight_layout() 
 plt.show() 
+
+print(stats.linregress(gas_weight, tire_weight))
