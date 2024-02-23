@@ -1,0 +1,940 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>821</width>
+    <height>588</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tabWidget">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>30</y>
+      <width>761</width>
+      <height>471</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="Model">
+     <attribute name="title">
+      <string>Model</string>
+     </attribute>
+     <widget class="QFrame" name="frame">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>-10</y>
+        <width>731</width>
+        <height>431</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QStackedWidget" name="stackedWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>421</width>
+         <height>291</height>
+        </rect>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="Home">
+        <widget class="QLabel" name="label_6">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>411</width>
+           <height>261</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap>../Tire-Optimizer-GUI/Images/Variables/Picture1.png</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Dm_page">
+        <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>130</x>
+           <y>90</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Dm</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Df_page">
+        <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>100</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Df</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="D_page">
+        <widget class="QLabel" name="label_3">
+         <property name="geometry">
+          <rect>
+           <x>220</x>
+           <y>150</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>D</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="Wm_page">
+        <widget class="QLabel" name="label_4">
+         <property name="geometry">
+          <rect>
+           <x>280</x>
+           <y>170</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Wm</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="N_page">
+        <widget class="QLabel" name="label_5">
+         <property name="geometry">
+          <rect>
+           <x>280</x>
+           <y>160</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>N</string>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>20</y>
+         <width>261</width>
+         <height>171</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="title">
+        <string>Design Variables</string>
+       </property>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>33</y>
+          <width>221</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Dm: mean tire diameter</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>DF: outer wheel flange diamter</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>D: rim diameter</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_15">
+           <property name="text">
+            <string>Wm: mean overall tire width</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>N: ply rating</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_8">
+       <property name="geometry">
+        <rect>
+         <x>19</x>
+         <y>299</y>
+         <width>401</width>
+         <height>111</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="title">
+        <string>Terms of Service</string>
+       </property>
+       <widget class="QTextBrowser" name="textBrowser_model_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>381</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &amp;quot;Software&amp;quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;THE SOFTWARE IS PROVIDED &amp;quot;AS IS&amp;quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_12">
+       <property name="geometry">
+        <rect>
+         <x>430</x>
+         <y>190</y>
+         <width>261</width>
+         <height>221</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>14</pointsize>
+        </font>
+       </property>
+       <property name="title">
+        <string>Background</string>
+       </property>
+       <widget class="QTextBrowser" name="textBrowser_model">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>241</width>
+          <height>181</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:14pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Todo: fill background &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </widget>
+      <zorder>groupBox_12</zorder>
+      <zorder>stackedWidget</zorder>
+      <zorder>groupBox</zorder>
+      <zorder>groupBox_8</zorder>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="Optimizer">
+     <attribute name="title">
+      <string>Optimizer</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupBox_9">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>220</y>
+        <width>351</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>Optimization Scope</string>
+      </property>
+      <widget class="QTableWidget" name="tableWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>331</width>
+         <height>171</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>331</width>
+         <height>0</height>
+        </size>
+       </property>
+       <row>
+        <property name="text">
+         <string>Dm</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>DF</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>D</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Wm</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>N</string>
+        </property>
+       </row>
+       <column>
+        <property name="text">
+         <string>Lower Bound</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Upper Bound</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Initial Value *</string>
+        </property>
+       </column>
+       <item row="0" column="0">
+        <property name="text">
+         <string>12</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="0" column="1">
+        <property name="text">
+         <string>56</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="0" column="2">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="1" column="0">
+        <property name="text">
+         <string>5</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="1" column="1">
+        <property name="text">
+         <string>33</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="1" column="2">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="2" column="0">
+        <property name="text">
+         <string>4</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="2" column="1">
+        <property name="text">
+         <string>24</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="2" column="2">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="3" column="0">
+        <property name="text">
+         <string>4</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="3" column="1">
+        <property name="text">
+         <string>21</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="3" column="2">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="4" column="0">
+        <property name="text">
+         <string>4</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="4" column="1">
+        <property name="text">
+         <string>38</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+       <item row="4" column="2">
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="textAlignment">
+         <set>AlignCenter</set>
+        </property>
+       </item>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_10">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>10</y>
+        <width>351</width>
+        <height>205</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>Optimization Parameter</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Loading Capacity [lbs]</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" colspan="2">
+        <widget class="QSpinBox" name="LmReq">
+         <property name="minimum">
+          <number>2000</number>
+         </property>
+         <property name="maximum">
+          <number>89000</number>
+         </property>
+         <property name="singleStep">
+          <number>1000</number>
+         </property>
+         <property name="value">
+          <number>36000</number>
+         </property>
+         <property name="displayIntegerBase">
+          <number>10</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Speed Index [mph]</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="QSpinBox" name="SiReq">
+         <property name="maximum">
+          <number>350</number>
+         </property>
+         <property name="singleStep">
+          <number>10</number>
+         </property>
+         <property name="value">
+          <number>200</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Cord Material</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="2">
+        <widget class="QComboBox" name="comboBox_3">
+         <item>
+          <property name="text">
+           <string>Aramid (Kevlar 29)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Cotton</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Polyester</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Rayon</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Polyamid Nylon</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="font">
+          <font>
+           <pointsize>13</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Aspect Ratio (min, max)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox">
+         <property name="minimum">
+          <double>0.500000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.050000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+         <property name="minimum">
+          <double>0.500000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.050000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Tolerance</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" colspan="2">
+        <widget class="QComboBox" name="comboBox_4">
+         <property name="currentText">
+          <string>1e-4</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>1e-3</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1e-4</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1e-5</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>1e-6</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>371</width>
+        <height>381</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>Optimizer Instruction</string>
+      </property>
+      <widget class="QTextBrowser" name="textBrowser">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>351</width>
+         <height>341</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="html">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:14pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Todo: fill optimizer instructions &lt;br /&gt;&lt;br /&gt;&lt;br /&gt;* Leave blank or enter 0 if using mean value between bounds. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="tabStopWidth">
+        <number>79</number>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="pushButton">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>400</y>
+        <width>171</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Run Optimizer</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="Output">
+     <attribute name="title">
+      <string>Output</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>251</width>
+        <height>431</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>Optimizer Description</string>
+      </property>
+      <widget class="QTextBrowser" name="textBrowser_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>231</width>
+         <height>391</height>
+        </rect>
+       </property>
+       <property name="html">
+        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:14pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Todo: format input summary &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>340</y>
+        <width>241</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>18</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Save to CSV</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_11">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>10</y>
+        <width>471</width>
+        <height>301</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>Optimization Output</string>
+      </property>
+      <widget class="QTableWidget" name="tableWidget_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>451</width>
+         <height>261</height>
+        </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>331</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>13</pointsize>
+        </font>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="sortingEnabled">
+        <bool>false</bool>
+       </property>
+       <attribute name="horizontalHeaderCascadingSectionResizes">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderCascadingSectionResizes">
+        <bool>true</bool>
+       </attribute>
+       <row>
+        <property name="text">
+         <string>Dm</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>DF</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>D</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Wm</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>N</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Loading Capacity [lbs]</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Inflation Pressure [psi]</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Est. Tire Mass [kg]</string>
+        </property>
+       </row>
+       <column>
+        <property name="text">
+         <string>Optimizer</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Michelin</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Goodyear</string>
+        </property>
+       </column>
+       <item row="0" column="0">
+        <property name="text">
+         <string/>
+        </property>
+       </item>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>821</width>
+     <height>36</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
