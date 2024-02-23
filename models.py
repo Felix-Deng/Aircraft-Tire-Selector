@@ -298,7 +298,7 @@ Tire Performance:
         ) / np.sin(alpha * np.pi / 180) / np.sin(phi * np.pi / 180) 
         
         return t * constants.lbf
-    def walter_fiber_count(self, beta_c = 30.0, m_1 = 0.000071, beta_s = 45.00, T = 75.9854, prho=0.92) -> float:
+    def walter_fiber_count(self, beta_c = 45.0, m_1 = 0.000071, beta_s = 45.00, T = 75.9854, prho=0.85) -> float:
         """Calculate the fiber count using formula form walter's paper
 
         Args:
