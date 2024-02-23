@@ -108,8 +108,8 @@ def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Op
 
 
 def _gradients_opt(
-    req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', fiber_break_load=338.0
+    req_Lm: float, speed_index: float, cord_break_load: float, 
+    scopes: Dict[str, Tuple[float, float, float]], tol=1e-4
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -117,18 +117,20 @@ def _gradients_opt(
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
-        scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
-            Dict[name_of_variable, Tuple[min_value, max_value]]
-        optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
-        fiber_break_load (float, optional): cord fiber material designed breaking load in N. 
-                Defaults to 338.0.
-
+        cord_break_load (float): cord material designed breaking load in N. 
+        scopes (Dict[str, Tuple[float, float, float]]): the domain of all design variables 
+            Dict[name_of_variable, Tuple[lower_bound, upper_bound, initial_guess]]
+        tol (float, optional): tolerance for termination. Defaults to 1e-4. 
+        
     Returns:
         Optional[Tire]: the optimized tire design 
     """
     init_val = {} # take average for initialized values 
     for key, item in scopes.items(): 
-        init_val[key] = (item[0] + item[1]) / 2
+        if not item[2] or item[2] < item[0] or item[2] > item[1]: 
+            init_val[key] = (item[0] + item[1]) / 2
+        else: 
+            init_val[key] = item[2]
     
     class LoadCapacity(om.ExplicitComponent): 
         """The explicit MDA component that defines the discipline 
@@ -261,12 +263,12 @@ def _gradients_opt(
     
     prob = om.Problem(reports=False) 
     prob.model = TireMDA()
-    prob.driver = om.ScipyOptimizeDriver(optimizer=optimizer) 
-    prob.driver.options['tol'] = 1e-4
+    prob.driver = om.ScipyOptimizeDriver(optimizer='SLSQP') 
+    prob.driver.options['tol'] = tol
     prob.driver.options['disp'] = False
     
     prob.model.add_constraint('Lm', lower=req_Lm) 
-    prob.model.add_constraint('fiber_tension', upper=fiber_break_load)
+    prob.model.add_constraint('fiber_tension', upper=cord_break_load)
     prob.model.approx_totals() 
     
     prob.setup() 
@@ -287,8 +289,8 @@ def _gradients_opt(
     return tire 
 
 def gradients_opt(
-    req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP'
+    req_Lm: float, speed_index: float, cord_break_load: float, 
+    scopes: Dict[str, Tuple[float, float]], tol=1e-4
 ) -> Tire: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -296,9 +298,10 @@ def gradients_opt(
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
+        cord_break_load (float, optional): cord material designed breaking load in N. 
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
-            Dict[name_of_variable, Tuple[min_value, max_value]]
-        optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
+            Dict[name_of_variable, Tuple[min_value, max_value, initial_guess]]
+        tol (float, optional): tolerance for termination. Defaults to 1e-4. 
 
     Returns:
         Tire: the optimized tire design 
@@ -307,7 +310,7 @@ def gradients_opt(
     counter = 0 
     while not tire: 
         counter += 1
-        tire = _gradients_opt(req_Lm, speed_index, scopes, optimizer)
+        tire = _gradients_opt(req_Lm, speed_index, cord_break_load, scopes, tol=tol)
         req_Lm += 1
         if counter == 10: 
             break 
