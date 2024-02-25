@@ -71,10 +71,10 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>../Tire-Optimizer-GUI/Images/Variables/Picture1.png</pixmap>
+          <pixmap>assets/variables.png</pixmap>
          </property>
          <property name="scaledContents">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

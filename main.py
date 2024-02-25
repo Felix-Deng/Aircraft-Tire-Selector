@@ -9,6 +9,7 @@
 
 
 import csv 
+import time 
 import datetime 
 import optimizer
 from models import Tire
@@ -16,6 +17,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
+    def __init__(self) -> None:
+        self.time_complete = None
+    
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(821, 588)
@@ -39,8 +43,8 @@ class Ui_MainWindow(object):
         self.label_6 = QtWidgets.QLabel(self.Home)
         self.label_6.setGeometry(QtCore.QRect(10, 20, 411, 261))
         self.label_6.setText("")
-        self.label_6.setPixmap(QtGui.QPixmap("../Tire-Optimizer-GUI/Images/Variables/Picture1.png"))
-        self.label_6.setScaledContents(False)
+        self.label_6.setPixmap(QtGui.QPixmap("assets/variables.png"))
+        self.label_6.setScaledContents(True)
         self.label_6.setAlignment(QtCore.Qt.AlignCenter)
         self.label_6.setObjectName("label_6")
         self.stackedWidget.addWidget(self.Home)
@@ -476,7 +480,7 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:14pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Todo: format input summary </p></body></html>"))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Please run optimizer in the \"Optimizer\" tab </p></body></html>"))
         self.pushButton_2.setText(_translate("MainWindow", "Save to CSV"))
         self.pushButton_2.clicked.connect(self.save_csv)
         self.groupBox_11.setTitle(_translate("MainWindow", "Optimization Output"))
@@ -539,47 +543,79 @@ class Ui_MainWindow(object):
             return output 
             
         # Receive user inputs 
-        scopes = {}
+        self.scopes = {}
         for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR']): 
-            scopes[var] = (
+            self.scopes[var] = (
                 float(self.tableWidget_2.item(i, 0).text()), 
                 float(self.tableWidget_2.item(i, 1).text()), 
                 float(self.tableWidget_2.item(i, 2).text()) 
             )
         
-        Lm_req = float(self.LmReq.text())
-        I_speed = float(self.SiReq.text()) 
-        tolerance = float(self.comboBox_4.itemText(self.comboBox_4.currentIndex()))
+        self.Lm_req = float(self.LmReq.text())
+        self.I_speed = float(self.SiReq.text()) 
+        self.tolerance = float(self.comboBox_4.itemText(self.comboBox_4.currentIndex()))
         
-        cord_brake_load = 0 
-        if self.comboBox_3.currentIndex() == 0: # Aramid (Kevlar 29)
-            cord_brake_load = 338.0 
-        elif self.comboBox_3.currentIndex() == 1: # Cotton 
-            cord_brake_load == 42.0 
-        elif self.comboBox_3.currentIndex() == 2: # Polyester
-            cord_brake_load == 228.0 
-        elif self.comboBox_3.currentIndex() == 3: # Rayon
-            cord_brake_load == 115.0 
-        elif self.comboBox_3.currentIndex() == 4: # Polyamid Nylon  
-            cord_brake_load == 175.0 
+        self.cord_brake_load = 0 
+        self.cord_material = self.comboBox_3.currentIndex()
+        if self.cord_material == 0: # Aramid (Kevlar 29)
+            self.cord_brake_load = 338.0 
+        elif self.cord_material == 1: # Cotton 
+            self.cord_brake_load == 42.0 
+        elif self.cord_material == 2: # Polyester
+            self.cord_brake_load == 228.0 
+        elif self.cord_material == 3: # Rayon
+            self.cord_brake_load == 115.0 
+        elif self.cord_material == 4: # Polyamid Nylon  
+            self.cord_brake_load == 175.0 
+        self.cord_material = self.comboBox_3.itemText(self.cord_material) # store material name 
         
-        aspect_ratio = [
+        self.aspect_ratio = [
             float(self.doubleSpinBox.text()), float(self.doubleSpinBox_2.text())
         ] # (min, max)
-        if aspect_ratio[0] >= aspect_ratio[1]: 
+        if self.aspect_ratio[0] >= self.aspect_ratio[1]: 
             self.show_warning("Aspect ratio min must be smaller than max!")
             return 
         
         # Run optimizer 
-        opt_tire = optimizer.gradients_opt(
-            Lm_req, I_speed, cord_brake_load, scopes, aspect_ratio, tolerance
+        st = time.time() 
+        self.opt_tire = optimizer.gradients_opt(
+            self.Lm_req * 1.07, self.I_speed, self.cord_brake_load, self.scopes, self.aspect_ratio, self.tolerance
         )
-        michelin_tire = optimizer.search_databook(Lm_req, I_speed, source='michelin')
-        goodyear_tire = optimizer.search_databook(Lm_req, I_speed, source='goodyear')
+        self.michelin_tire = optimizer.search_databook(self.Lm_req * 1.07,self. I_speed, source='michelin')
+        self.goodyear_tire = optimizer.search_databook(self.Lm_req * 1.07, self.I_speed, source='goodyear')
+        self.time_elapsed = time.time() - st
+        self.time_complete = datetime.datetime.now()
+        
+        # Print summary of input 
+        input_summary = f"""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+    p, li {{ white-space: pre-wrap; }}
+</style></head><body style=" font-family:'.AppleSystemUIFont'; font-size:14pt; font-weight:400; font-style:normal;">
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><strong>Optimization input:</strong></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Loading capacity [lbs]: {self.Lm_req}</p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Speed index [mph]: {self.I_speed}</p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Cord material: {self.cord_material}</p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Cord brake strength [N]: {self.cord_brake_load}</p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Tolerance: {self.tolerance}</p>
+<br /><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><strong>Optimization scope:</strong></p>
+        """
+        for var in ['Dm', 'DF', 'D', 'Wm', 'PR']: 
+            var_display = var if var != "PR" else "N"
+            init = self.scopes[var][2] if self.scopes[var][2] else (self.scopes[var][0] + self.scopes[var][1]) / 2
+            input_summary += f"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">{var_display}: [{self.scopes[var][0]}, {self.scopes[var][1]}] (init: {init})</p>"
+        input_summary += f"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Aspect ratio: [{self.aspect_ratio[0]}, {self.aspect_ratio[1]}]</p><br />"
+        
+        input_summary += f"""<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><strong>Optimization details:</strong></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Time elapsed: {round(self.time_elapsed, 4)} seconds</p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Time completed: {self.time_complete.strftime("%Y-%m-%d %H:%M:%S")}</p>
+        """
+        
+        input_summary += "</body></html>"
+        self.textBrowser_2.setHtml(input_summary)
         
         # Print output 
-        if opt_tire: 
-            output = retrieve_tire_data(opt_tire)
+        if self.opt_tire: 
+            output = retrieve_tire_data(self.opt_tire)
             for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "Lm", "IP", "Mass"]): 
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(str(round(output[var], 2)))
@@ -590,8 +626,8 @@ class Ui_MainWindow(object):
                 item.setText("N/A")
                 self.tableWidget_3.setItem(i, 0, item)
                 
-        if michelin_tire: 
-            output = retrieve_tire_data(michelin_tire)
+        if self.michelin_tire: 
+            output = retrieve_tire_data(self.michelin_tire)
             for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "Lm", "IP", "Mass"]): 
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(str(round(output[var], 2)))
@@ -602,8 +638,8 @@ class Ui_MainWindow(object):
                 item.setText("N/A")
                 self.tableWidget_3.setItem(i, 1, item)
         
-        if goodyear_tire: 
-            output = retrieve_tire_data(goodyear_tire)
+        if self.goodyear_tire: 
+            output = retrieve_tire_data(self.goodyear_tire)
             for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "Lm", "IP", "Mass"]): 
                 item = QtWidgets.QTableWidgetItem()
                 item.setText(str(round(output[var], 2)))
@@ -618,16 +654,45 @@ class Ui_MainWindow(object):
         self.tabWidget.setCurrentIndex(2)
         
     def save_csv(self): 
-        current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        with open("opt_output_{}.csv".format(current_datetime), "w") as csv_file: 
+        if not self.time_complete: 
+            self.show_warning("Please run optimizer before saving results in CSV.")
+            return 
+        
+        with open("opt_output_{}.csv".format(self.time_complete.strftime("%Y-%m-%d_%H-%M-%S")), "w") as csv_file: 
             csv_writer = csv.writer(csv_file)
+            
+            csv_writer.writerow(['Optimization details'])
+            csv_writer.writerow(['Time completed', self.time_complete.strftime("%Y-%m-%d %H:%M:%S")])
+            csv_writer.writerow(['Time eplased', self.time_elapsed, 'seconds'])
+            csv_writer.writerow(['Optimizer', 'SLSQP'])
+            csv_writer.writerow(['Success', self.opt_tire != None])
+            csv_writer.writerow([])
+            
+            csv_writer.writerow(['Optimization inputs'])
+            csv_writer.writerow(["Loading capacity", self.Lm_req, "lbs"])
+            csv_writer.writerow(["Speed index", self.I_speed, "mph"])
+            csv_writer.writerow(["Cord material", self.cord_material])
+            csv_writer.writerow(["Cord brake strength", self.cord_brake_load, "N"])
+            csv_writer.writerow(["Tolerance of termination", self.tolerance])
+            csv_writer.writerow([])
+            
+            csv_writer.writerow(['Optimization scope'])
+            csv_writer.writerow(['Variable', 'Min', 'Max', 'Initial'])
+            for var in ['Dm', 'DF', 'D', 'Wm', 'PR']: 
+                var_display = var + " [in]" if var != "PR" else "N"
+                init = self.scopes[var][2] if self.scopes[var][2] else (self.scopes[var][0] + self.scopes[var][1]) / 2
+                csv_writer.writerow([var_display, self.scopes[var][0], self.scopes[var][1], init])
+            csv_writer.writerow(['Aspect ratio'] + self.aspect_ratio)
+            csv_writer.writerow([])
+            
+            csv_writer.writerow(['Optimization results'])
             csv_writer.writerow(['', 'Optimizer', 'Michelin', 'Goodyear'])
             for i in range(7): 
                 row = [self.tableWidget_3.verticalHeaderItem(i).text()] 
                 for j in range(3): 
                     row.append(self.tableWidget_3.item(i, j).text())
                 csv_writer.writerow(row)
-        
+
         self.show_complete("CSV exported successfully!")
                 
 
