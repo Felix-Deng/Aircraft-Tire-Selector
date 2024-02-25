@@ -230,6 +230,24 @@ Tire Performance:
         V = constants.pi**2 * self.Wm * H * (self.D + H) / 4 * constants.inch**3
         
         return P_abs * V * M_gas / constants.R / T / 1000 
+
+    def estimated_tire_mass(self, gas_mass=0.0) -> float: 
+        """Calculate an estimation of overall mass of the entire tire based on correlation found 
+        from Goodyear's databook. 
+
+        Args:
+            gas_mass (float, optional): mass of the tire inflation medium in kg. 
+                Defaults to 0.0 to call the self.inflation_medium_mass() function with 
+                default arguments.
+
+        Returns:
+            float: estimated tire mass in kg. 
+        """
+        if not gas_mass: 
+            gas_mass = self.inflation_medium_mass() 
+        
+        return gas_mass * 18.05 + 10.64
+        
     
     def inflation_pressure(self) -> float: 
         """

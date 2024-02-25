@@ -535,7 +535,7 @@ class Ui_MainWindow(object):
             output['PR'] = tire.PR
             output['Lm'] = tire.max_load_capacity()
             output['IP'] = tire.inflation_pressure() 
-            output['Mass'] = tire.inflation_medium_mass() * 18.05 + 10.64
+            output['Mass'] = tire.estimated_tire_mass()
             return output 
             
         # Receive user inputs 
