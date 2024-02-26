@@ -36,8 +36,8 @@ with open("manufacturer_data/goodyear_bias.csv") as data_csv:
         model_Lm.append(tire.max_load_capacity())
         manu_IP.append(float(row[6]))
         model_IP.append(tire.inflation_pressure())
-        tire_weight.append(float(row[11]))
-        gas_weight.append(tire.inflation_medium_mass() / constants.lb)
+        tire_weight.append(float(row[11]) * constants.lb)
+        gas_weight.append(tire.inflation_medium_mass())
         
 print(np.mean([model_Lm[i] - item for i, item in enumerate(manu_Lm)]))
 print(np.mean([model_IP[i] - item for i, item in enumerate(manu_IP)])) 
@@ -52,8 +52,8 @@ ax.plot(
     color='red', label=r'$R^2 = {}$'.format(round(lin_res.rvalue**2, 3))
 )
 ax.legend() 
-ax.set_xlabel("Tire Weight [lbs]")
-ax.set_ylabel("Mass of Tire Inflation Medium [lbs]")
+ax.set_xlabel("Overall Mass of Tire [kg]")
+ax.set_ylabel("Mass of Tire Inflation Medium [kg]")
 
 plt.tight_layout() 
 plt.show() 

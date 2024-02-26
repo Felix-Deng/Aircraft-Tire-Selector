@@ -246,7 +246,7 @@ Tire Performance:
         if not gas_mass: 
             gas_mass = self.inflation_medium_mass() 
         
-        return gas_mass * 18.05 + 10.64
+        return gas_mass * 18.0486 + 4.8282
         
     
     def inflation_pressure(self) -> float: 
