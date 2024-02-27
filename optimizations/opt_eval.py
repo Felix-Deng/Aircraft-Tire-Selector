@@ -5,8 +5,7 @@ from scipy import stats
 from gradients import gradients_opt 
 from selector import search_databook 
 
-testing_Lm = np.arange(2000, 72000, 10000) 
-total_time = 0 
+testing_Lm = np.linspace(2000, 72000, 10)
 
 Lm_michelin = [] 
 Lm_goodyear = []
@@ -44,26 +43,25 @@ for Lm in testing_Lm:
         Lm_goodyear.append(Lm)
         perf_goodyear.append(tire.estimated_tire_mass())
     # Test gradients 
-    temp_time = [] 
-    temp_perf = [] 
-    for _ in range(3): 
-        st = time.time() 
-        tire = gradients_opt(Lm, 0, scopes=scopes) 
-        temp_time.append(time.time() - st)
-        temp_perf.append(tire.estimated_tire_mass())
-    Lm_gradients.append(Lm)
-    time_gradients.append(np.mean(temp_time))
-    perf_gradients.append(np.mean(temp_perf))
+    st = time.time() 
+    tire = gradients_opt(Lm, 0, scopes=scopes) 
+    if tire: 
+        time_gradients.append(time.time() - st)
+        perf_gradients.append(tire.estimated_tire_mass())
+        Lm_gradients.append(Lm)
 
 # Line of best fit 
 lin_res = stats.linregress(Lm_michelin, perf_michelin)
 michelin_m, michelin_b = lin_res.slope, lin_res.intercept
+print("Michelin:", lin_res)
 lin_res = stats.linregress(Lm_goodyear, perf_goodyear)
 goodyear_m, good_year_b = lin_res.slope, lin_res.intercept
+print("Goodyear:", lin_res)
 lin_res = stats.linregress(Lm_gradients, perf_gradients)
 gradients_m, gradients_b = lin_res.slope, lin_res.intercept
+print("openMDAO:", lin_res)
 
-# Plotting 
+# Plotting mass performance 
 plt.rcParams.update({
     'font.size': 28 
 })
@@ -72,7 +70,7 @@ s = 200 # marker size
 _, ax = plt.subplots(figsize=(16, 10))
 ax.scatter(Lm_michelin, perf_michelin, marker='o', s=s, label='Michelin')
 ax.scatter(Lm_goodyear, perf_goodyear, marker='^', s=s, label='Goodyear')
-ax.scatter(Lm_gradients, perf_gradients, marker='x', s=s, label='Proposed Method')
+ax.scatter(Lm_gradients, perf_gradients, marker='x', s=s, label='Developed Framework')
 
 x = np.array([Lm_michelin[0], Lm_michelin[-1]]) 
 ax.plot(x, michelin_m * x + michelin_b, ls='--')
@@ -85,5 +83,14 @@ ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 ax.set_xlabel("Desired Loading Capability [lbs]")
 ax.set_ylabel("Estimated Tire Mass [kg]")
 plt.legend() 
+plt.tight_layout() 
+plt.show() 
+
+# Plotting computational time 
+_, ax = plt.subplots()
+ax.scatter(Lm_gradients, time_gradients, marker='x')
+ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
+ax.set_xlabel("Desired Loading Capability [lbs]")
+ax.set_ylabel("Expected Computation Time [sec]")
 plt.tight_layout() 
 plt.show() 

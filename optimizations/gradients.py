@@ -132,9 +132,6 @@ def _gradients_opt(
             cycle.add_subsystem('d', LoadCapacity())
             cycle.add_subsystem('e', MechFeasibility())
             
-            cycle.nonlinear_solver = om.NonlinearBlockGS()
-            cycle.linear_solver = om.ScipyKrylov()
-            
             self.add_subsystem('obj_cmp', GasMass())
             
             self.add_subsystem(
