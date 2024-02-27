@@ -621,7 +621,7 @@ class Ui_MainWindow(object):
                 item.setText(str(round(output[var], 2)))
                 self.tableWidget_3.setItem(i, 0, item)
         else: 
-            for i in range(7):
+            for i in range(8):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText("N/A")
                 self.tableWidget_3.setItem(i, 0, item)
@@ -633,7 +633,7 @@ class Ui_MainWindow(object):
                 item.setText(str(round(output[var], 2)))
                 self.tableWidget_3.setItem(i, 1, item)
         else: 
-            for i in range(7):
+            for i in range(8):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText("N/A")
                 self.tableWidget_3.setItem(i, 1, item)
@@ -645,7 +645,7 @@ class Ui_MainWindow(object):
                 item.setText(str(round(output[var], 2)))
                 self.tableWidget_3.setItem(i, 2, item)
         else: 
-            for i in range(7):
+            for i in range(8):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText("N/A")
                 self.tableWidget_3.setItem(i, 2, item)
@@ -687,7 +687,7 @@ class Ui_MainWindow(object):
             
             csv_writer.writerow(['Optimization results'])
             csv_writer.writerow(['', 'Optimizer', 'Michelin', 'Goodyear'])
-            for i in range(7): 
+            for i in range(8): 
                 row = [self.tableWidget_3.verticalHeaderItem(i).text()] 
                 for j in range(3): 
                     row.append(self.tableWidget_3.item(i, j).text())
