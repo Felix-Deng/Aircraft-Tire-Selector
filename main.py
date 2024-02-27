@@ -371,7 +371,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Tire Optimizer"))
         self.label.setText(_translate("MainWindow", "Dm"))
         self.label_2.setText(_translate("MainWindow", "Df"))
         self.label_3.setText(_translate("MainWindow", "D"))
@@ -379,7 +379,7 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "N"))
         self.groupBox.setTitle(_translate("MainWindow", "Design Variables"))
         self.label_12.setText(_translate("MainWindow", "Dm: mean tire diameter"))
-        self.label_13.setText(_translate("MainWindow", "DF: outer wheel flange diamter"))
+        self.label_13.setText(_translate("MainWindow", "DF: outer wheel flange diameter"))
         self.label_14.setText(_translate("MainWindow", "D: rim diameter"))
         self.label_15.setText(_translate("MainWindow", "Wm: mean overall tire width"))
         self.label_16.setText(_translate("MainWindow", "N: ply rating"))
@@ -663,7 +663,7 @@ class Ui_MainWindow(object):
             
             csv_writer.writerow(['Optimization details'])
             csv_writer.writerow(['Time completed', self.time_complete.strftime("%Y-%m-%d %H:%M:%S")])
-            csv_writer.writerow(['Time eplased', self.time_elapsed, 'seconds'])
+            csv_writer.writerow(['Time elapsed', self.time_elapsed, 'seconds'])
             csv_writer.writerow(['Optimizer', 'SLSQP'])
             csv_writer.writerow(['Success', self.opt_tire != None])
             csv_writer.writerow([])
