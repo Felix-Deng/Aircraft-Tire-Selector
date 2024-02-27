@@ -581,7 +581,7 @@ class Ui_MainWindow(object):
         self.opt_tire = optimizer.gradients_opt(
             self.Lm_req * 1.07, self.I_speed, self.cord_brake_load, self.scopes, self.aspect_ratio, self.tolerance
         )
-        self.michelin_tire = optimizer.search_databook(self.Lm_req * 1.07,self. I_speed, source='michelin')
+        self.michelin_tire = optimizer.search_databook(self.Lm_req * 1.07, self.I_speed, source='michelin')
         self.goodyear_tire = optimizer.search_databook(self.Lm_req * 1.07, self.I_speed, source='goodyear')
         self.time_elapsed = time.time() - st
         self.time_complete = datetime.datetime.now()
