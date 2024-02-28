@@ -57,13 +57,13 @@ def search_databook(Lm_des: float, speed_index_des=0.0, max_pressure=float('inf'
                     (manu_dim[5] and manu_dim[9]) and # required design parameters present 
                     manu_dim[5] >= Lm_des and # check if Lm meet requirement 
                     (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) and # check if speed index meet requirement (if any)
-                    manu_dim[7] <= max_pressure # check if inflation pressure exceeds maximum 
+                    manu_dim[6] <= max_pressure # check if inflation pressure exceeds maximum 
                 ):
                     tire = Tire(
                         D=manu_dim[2], PR=manu_dim[3], SI=manu_dim[4], Lm=manu_dim[5], 
                         DoMax=manu_dim[8], DoMin=manu_dim[9], WMax=manu_dim[10], 
                         WMin=manu_dim[11], RD=manu_dim[18], FH=manu_dim[19], DF=manu_dim[21], 
-                        IP=manu_dim[7] 
+                        IP=manu_dim[6]
                     )
                     if tire.IP or tire.inflation_pressure() <= max_pressure: # account for tires with inflation pressure missing 
                         curr_mass = tire.inflation_medium_mass()
@@ -124,7 +124,7 @@ def _gradients_opt(
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
-        max_inflation_pressure (float, optional): maximum pressure that the 
+        max_inflation_pressure (float): maximum pressure that the 
             tire can be inflated to in psi. 
         cord_break_load (float): cord material designed breaking load in N. 
         scopes (Dict[str, Tuple[float, float, float]]): the domain of all design variables 
@@ -338,7 +338,7 @@ def gradients_opt(
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
-        max_inflation_pressure (float, optional): maximum pressure that the 
+        max_inflation_pressure (float): maximum pressure that the 
             tire can be inflated to in psi. 
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value, initial_guess]]

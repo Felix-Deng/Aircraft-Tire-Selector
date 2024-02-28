@@ -23,7 +23,8 @@ from selector import search_databook
 
 def _gradients_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', fiber_break_load=338.0, reports=False, disp=False, record=False  
+    optimizer: str='SLSQP', max_inflation_pressure=float('inf'), fiber_break_load=338.0, 
+    reports=False, disp=False, record=False  
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -34,6 +35,8 @@ def _gradients_opt(
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
+        max_inflation_pressure (float, optional): maximum pressure that the 
+            tire can be inflated to in psi. Defaults to inf. 
         fiber_break_load (float, optional): cord fiber material designed breaking load in N. 
                 Defaults to 332.0.
         reports (bool, optional): should reports be auto generated? Defaults to False.
@@ -71,6 +74,31 @@ def _gradients_opt(
             
             tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF, SI=speed_index)
             outputs['Lm'] = tire.max_load_capacity(exact=True)
+            
+    class InflationPressure(om.ExplicitComponent): 
+        """The explicit MDA component that defines the discipline 
+        (correlation of all optimizing variables) for optimization. 
+        """
+        def setup(self): 
+            self.add_input('Dm', val=init_val['Dm'])
+            self.add_input('Wm', val=init_val['Wm'])
+            self.add_input('D', val=init_val['D'])
+            self.add_input('DF', val=init_val['DF'])
+            self.add_input('PR', val=init_val['PR'])
+            self.add_output('IP')
+        
+        def setup_partials(self):
+            self.declare_partials('*', '*', method='fd')
+        
+        def compute(self, inputs, outputs):
+            Dm = inputs['Dm']
+            Wm = inputs['Wm']
+            D = inputs['D']
+            DF = inputs['DF']
+            PR = inputs['PR']
+            
+            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF, SI=speed_index)
+            outputs['IP'] = tire.inflation_pressure()
 
     class GasMass(om.ExplicitComponent): 
         """The explicit MDA component that defines the objective 
@@ -130,7 +158,8 @@ def _gradients_opt(
         def setup(self):
             cycle = self.add_subsystem('cycle', om.Group())
             cycle.add_subsystem('d', LoadCapacity())
-            cycle.add_subsystem('e', MechFeasibility())
+            cycle.add_subsystem('e', InflationPressure())
+            cycle.add_subsystem('f', MechFeasibility())
             
             self.add_subsystem('obj_cmp', GasMass())
             
@@ -149,10 +178,14 @@ def _gradients_opt(
                     Dm=init_val['Dm'], D=init_val['D'], Wm=init_val['Wm']
                 )
             ) # aspect ratio 
+            self.add_subsystem(
+                'con_cmp5', om.ExecComp('con5 = IP')
+            )
             
         def configure(self):
             self.cycle.promotes('d', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['Lm'])
-            self.cycle.promotes('e', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['fiber_tension'])
+            self.cycle.promotes('e', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['IP'])
+            self.cycle.promotes('f', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['fiber_tension'])
             self.promotes('cycle', any=['*'])
             
             self.promotes('obj_cmp', any=['Dm', 'Wm', 'D', 'DF', 'PR', 'mass'])
@@ -160,6 +193,7 @@ def _gradients_opt(
             self.promotes('con_cmp2', any=['con2', 'Dm', 'DF'])
             self.promotes('con_cmp3', any=['con3', 'DF', 'D'])
             self.promotes('con_cmp4', any=['con4', 'Dm', 'D', 'Wm'])
+            self.promotes('con_cmp5', any=['con5', 'IP'])
             
             self.add_design_var('Dm', lower=scopes['Dm'][0], upper=scopes['Dm'][1])
             self.add_design_var('Wm', lower=scopes['Wm'][0], upper=scopes['Wm'][1])
@@ -172,6 +206,7 @@ def _gradients_opt(
             self.add_constraint('con2', lower=0.0001)
             self.add_constraint('con3', lower=0.0001)
             self.add_constraint('con4', lower=0.5, upper=1.0) # TRA standard
+            self.add_constraint('con5', upper=max_inflation_pressure)
     
     prob = om.Problem(reports=reports) 
     prob.model = TireMDA()
@@ -209,7 +244,8 @@ def _gradients_opt(
 
 def gradients_opt(
     req_Lm: float, speed_index: float, scopes: Dict[str, Tuple[float, float]], 
-    optimizer: str='SLSQP', reports=False, disp=False, record=False 
+    optimizer: str='SLSQP', max_inflation_pressure=float('inf'), reports=False, 
+    disp=False, record=False 
 ) -> Tire: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -220,6 +256,8 @@ def gradients_opt(
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value]]
         optimizer (str, optional): optimizer type for om.ScipyOptimizeDriver. Defaults to 'SLSQP'. 
+        max_inflation_pressure (float): maximum pressure that the 
+            tire can be inflated to in psi. Defaults to inf. 
         reports (bool, optional): should reports be auto generated? Defaults to False.
         disp (bool, optional): should convergence messages be printed? Defaults to False. 
         record (bool, optional): should iteration history be recorded? Defaults to False. 
@@ -233,7 +271,10 @@ def gradients_opt(
         counter += 1
         if counter > 1: 
             print("openMDAO optimization failed to return a valid tire design. Starting attempt number {} ...".format(counter))
-        tire = _gradients_opt(req_Lm, speed_index, scopes, optimizer, reports=reports, disp=disp, record=record)
+        tire = _gradients_opt(
+            req_Lm, speed_index, scopes, optimizer, max_inflation_pressure=max_inflation_pressure, 
+            reports=reports, disp=disp, record=record
+        )
         req_Lm += 1
         if counter == 10: 
             return None 

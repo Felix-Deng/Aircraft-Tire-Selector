@@ -9,13 +9,14 @@ from scipy import constants
 
 from _models import Tire
 
-def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Optional[Tire]:
+def search_databook(Lm_des: float, speed_index_des=0.0, max_pressure=float('inf'), source='michelin') -> Optional[Tire]:
     """Given the desired loading capacity, find the corresponding tire specifications 
     from the Michelin Tire Databook. 
 
     Args:
         Lm_des (float): required tire loading capability in lbs. 
         speed_index_des (float, optional): designed speed rating for the aircraft in mph. Defaults to 0.0.
+        max_pressure (float, optional): maximum pressure that the tire can be inflated to. Defaults to inf. 
         source (str, optional): source of manufacturer databook from {'michelin', 'goodyear'}. 
             Defaults to 'michelin'. 
 
@@ -43,18 +44,21 @@ def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Op
                 if (
                     (manu_dim[5] and manu_dim[9]) and # required design parameters present 
                     manu_dim[5] >= Lm_des and # check if Lm meet requirement 
-                    (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) # check if speed index meet requirement (if any)
+                    (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) and # check if speed index meet requirement (if any)
+                    manu_dim[6] <= max_pressure # check if inflation pressure exceeds maximum 
                 ):
                     tire = Tire(
                         D=manu_dim[2], PR=manu_dim[3], SI=manu_dim[4], Lm=manu_dim[5], 
                         DoMax=manu_dim[8], DoMin=manu_dim[9], WMax=manu_dim[10], 
-                        WMin=manu_dim[11], RD=manu_dim[18], FH=manu_dim[19], DF=manu_dim[21]
+                        WMin=manu_dim[11], RD=manu_dim[18], FH=manu_dim[19], DF=manu_dim[21], 
+                        IP=manu_dim[6] 
                     )
-                    curr_mass = tire.inflation_medium_mass()
-                    # Check if better than current best 
-                    if curr_mass < lowest_mass: 
-                        lowest_mass = curr_mass 
-                        best_tire = copy.deepcopy(tire) 
+                    if tire.IP or tire.inflation_pressure() <= max_pressure: # account for tires with inflation pressure missing 
+                        curr_mass = tire.inflation_medium_mass()
+                        # Check if better than current best 
+                        if curr_mass < lowest_mass: 
+                            lowest_mass = curr_mass 
+                            best_tire = copy.deepcopy(tire) 
     elif source == 'goodyear': 
         with open("manufacturer_data/goodyear_bias.csv") as data_csv: 
             csv_reader = csv.reader(data_csv)
@@ -77,18 +81,21 @@ def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Op
                 if (
                     (manu_dim[5] and manu_dim[12]) and # required design parameters present 
                     manu_dim[5] >= Lm_des and # check if Lm meet requirement 
-                    (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) # check if speed index meet requirement (if any)
+                    (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) and # check if speed index meet requirement (if any)
+                    manu_dim[6] <= max_pressure # check if inflation pressure exceeds maximum 
                 ):
                     tire = Tire(
                         D=manu_dim[23], PR=manu_dim[2], SI=manu_dim[4], Lm=manu_dim[5], 
                         DoMax=manu_dim[12], DoMin=manu_dim[13], WMax=manu_dim[14], 
-                        WMin=manu_dim[15], RD=manu_dim[23], FH=manu_dim[24]
+                        WMin=manu_dim[15], RD=manu_dim[23], FH=manu_dim[24], 
+                        IP=manu_dim[6], WGT=manu_dim[11]
                     )
-                    curr_mass = tire.inflation_medium_mass()
-                    # Check if better than current best 
-                    if curr_mass < lowest_mass: 
-                        lowest_mass = curr_mass 
-                        best_tire = copy.deepcopy(tire) 
+                    if tire.IP or tire.inflation_pressure() <= max_pressure: # account for tires with inflation pressure missing 
+                        curr_mass = tire.mass
+                        # Check if better than current best 
+                        if curr_mass < lowest_mass: 
+                            lowest_mass = curr_mass 
+                            best_tire = copy.deepcopy(tire) 
     else: 
         raise ValueError("Unsupported source, please choose from {'michelin', 'goodyear'}.") 
     

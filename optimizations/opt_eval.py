@@ -30,21 +30,21 @@ scopes = {
 for Lm in testing_Lm: 
     # Test Michelin 
     st = time.time() 
-    tire = search_databook(Lm, source='michelin')
+    tire = search_databook(Lm, max_pressure=400, source='michelin')
     time_michelin.append(time.time() - st)
     if tire: 
         Lm_michelin.append(Lm)
         perf_michelin.append(tire.estimated_tire_mass())
     # Test Goodyear 
     st = time.time() 
-    tire = search_databook(Lm, source='goodyear')
+    tire = search_databook(Lm, max_pressure=400, source='goodyear')
     time_goodyear.append(time.time() - st)
     if tire: 
         Lm_goodyear.append(Lm)
-        perf_goodyear.append(tire.estimated_tire_mass())
+        perf_goodyear.append(tire.mass)
     # Test gradients 
     st = time.time() 
-    tire = gradients_opt(Lm, 0, scopes=scopes) 
+    tire = gradients_opt(Lm, 0, max_inflation_pressure=400, scopes=scopes) 
     if tire: 
         time_gradients.append(time.time() - st)
         perf_gradients.append(tire.estimated_tire_mass())
