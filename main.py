@@ -691,7 +691,12 @@ class Ui_MainWindow(object):
                 
 
 if __name__ == "__main__": 
-    import sys 
+    import sys
+    import os  
+    os.environ['QT_AUTO_SCREEN_SCALE_FACTOR'] = "1"
+    os.environ['QT_SCALE_FACTOR'] = "1"
+    os.environ['QT_ENABLE_HIGHDPI_SCALING'] = "1"
+    sys.argv += ['--style', 'windows']
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow() 
     ui = Ui_MainWindow() 

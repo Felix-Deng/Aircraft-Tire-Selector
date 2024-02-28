@@ -45,7 +45,7 @@ Before making changes to your local code repository:
     - If your branch is behind the main branch, you may want to **rebase** your branch to the current main branch. This can be done in the "Source Control" tab of the left panel. 
 3. Make sure you are working in your local virtual environment, where you should see `(venv)` in front of the `(base)` in your terminal's command lines. If not, run the following command in terminal to activate the virtual environment: 
     - In MacOS: `source venv/bin/activate`. 
-    - In Windows: `source venv/Scripts/activate`.
+    - In Windows: `venv/Scripts/activate`.
 4. Update your local virtual environment to the new `requirements.txt`, if any changes were made from others' commits. 
     - Run the following command in terminal: `pip install -r requirements.txt`. 
 5. Now you can make your changes to the code. Meanwhile, please follow guidelines in the `dev_notes.md` file. 
