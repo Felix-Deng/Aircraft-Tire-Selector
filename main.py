@@ -11,6 +11,7 @@
 import csv 
 import time 
 import datetime 
+from typing import Dict 
 import optimizer
 from models import Tire
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -35,78 +36,35 @@ class Ui_MainWindow(object):
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
-        self.stackedWidget = QtWidgets.QStackedWidget(self.frame)
-        self.stackedWidget.setGeometry(QtCore.QRect(10, 10, 421, 291))
-        self.stackedWidget.setObjectName("stackedWidget")
-        self.Home = QtWidgets.QWidget()
-        self.Home.setObjectName("Home")
-        self.label_6 = QtWidgets.QLabel(self.Home)
-        self.label_6.setGeometry(QtCore.QRect(10, 20, 411, 261))
-        self.label_6.setText("")
-        self.label_6.setPixmap(QtGui.QPixmap("assets/variables.png"))
-        self.label_6.setScaledContents(True)
-        self.label_6.setAlignment(QtCore.Qt.AlignCenter)
-        self.label_6.setObjectName("label_6")
-        self.stackedWidget.addWidget(self.Home)
-        self.Dm_page = QtWidgets.QWidget()
-        self.Dm_page.setObjectName("Dm_page")
-        self.label = QtWidgets.QLabel(self.Dm_page)
-        self.label.setGeometry(QtCore.QRect(130, 90, 60, 16))
-        self.label.setObjectName("label")
-        self.stackedWidget.addWidget(self.Dm_page)
-        self.Df_page = QtWidgets.QWidget()
-        self.Df_page.setObjectName("Df_page")
-        self.label_2 = QtWidgets.QLabel(self.Df_page)
-        self.label_2.setGeometry(QtCore.QRect(200, 100, 60, 16))
-        self.label_2.setObjectName("label_2")
-        self.stackedWidget.addWidget(self.Df_page)
-        self.D_page = QtWidgets.QWidget()
-        self.D_page.setObjectName("D_page")
-        self.label_3 = QtWidgets.QLabel(self.D_page)
-        self.label_3.setGeometry(QtCore.QRect(220, 150, 60, 16))
-        self.label_3.setObjectName("label_3")
-        self.stackedWidget.addWidget(self.D_page)
-        self.Wm_page = QtWidgets.QWidget()
-        self.Wm_page.setObjectName("Wm_page")
-        self.label_4 = QtWidgets.QLabel(self.Wm_page)
-        self.label_4.setGeometry(QtCore.QRect(280, 170, 60, 16))
-        self.label_4.setObjectName("label_4")
-        self.stackedWidget.addWidget(self.Wm_page)
-        self.N_page = QtWidgets.QWidget()
-        self.N_page.setObjectName("N_page")
-        self.label_5 = QtWidgets.QLabel(self.N_page)
-        self.label_5.setGeometry(QtCore.QRect(280, 160, 60, 16))
-        self.label_5.setObjectName("label_5")
-        self.stackedWidget.addWidget(self.N_page)
         self.groupBox = QtWidgets.QGroupBox(self.frame)
         self.groupBox.setGeometry(QtCore.QRect(430, 20, 261, 171))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.groupBox.setFont(font)
         self.groupBox.setObjectName("groupBox")
-        self.widget = QtWidgets.QWidget(self.groupBox)
-        self.widget.setGeometry(QtCore.QRect(15, 33, 221, 121))
-        self.widget.setObjectName("widget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.widget)
+        self.layoutWidget = QtWidgets.QWidget(self.groupBox)
+        self.layoutWidget.setGeometry(QtCore.QRect(15, 33, 221, 121))
+        self.layoutWidget.setObjectName("layoutWidget")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.layoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.label_12 = QtWidgets.QLabel(self.widget)
+        self.label_12 = QtWidgets.QLabel(self.layoutWidget)
         self.label_12.setObjectName("label_12")
         self.verticalLayout.addWidget(self.label_12)
-        self.label_13 = QtWidgets.QLabel(self.widget)
+        self.label_13 = QtWidgets.QLabel(self.layoutWidget)
         self.label_13.setObjectName("label_13")
         self.verticalLayout.addWidget(self.label_13)
-        self.label_14 = QtWidgets.QLabel(self.widget)
+        self.label_14 = QtWidgets.QLabel(self.layoutWidget)
         self.label_14.setObjectName("label_14")
         self.verticalLayout.addWidget(self.label_14)
-        self.label_15 = QtWidgets.QLabel(self.widget)
+        self.label_15 = QtWidgets.QLabel(self.layoutWidget)
         self.label_15.setObjectName("label_15")
         self.verticalLayout.addWidget(self.label_15)
-        self.label_16 = QtWidgets.QLabel(self.widget)
+        self.label_16 = QtWidgets.QLabel(self.layoutWidget)
         self.label_16.setObjectName("label_16")
         self.verticalLayout.addWidget(self.label_16)
         self.groupBox_8 = QtWidgets.QGroupBox(self.frame)
-        self.groupBox_8.setGeometry(QtCore.QRect(19, 299, 401, 111))
+        self.groupBox_8.setGeometry(QtCore.QRect(19, 300, 401, 111))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.groupBox_8.setFont(font)
@@ -128,21 +86,28 @@ class Ui_MainWindow(object):
         self.textBrowser_model.setGeometry(QtCore.QRect(10, 30, 241, 181))
         self.textBrowser_model.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.textBrowser_model.setObjectName("textBrowser_model")
+        self.label_6 = QtWidgets.QLabel(self.frame)
+        self.label_6.setGeometry(QtCore.QRect(20, 30, 391, 251))
+        self.label_6.setText("")
+        self.label_6.setPixmap(QtGui.QPixmap("assets/variables.png"))
+        self.label_6.setScaledContents(True)
+        self.label_6.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_6.setObjectName("label_6")
         self.groupBox_12.raise_()
-        self.stackedWidget.raise_()
         self.groupBox.raise_()
         self.groupBox_8.raise_()
+        self.label_6.raise_()
         self.tabWidget.addTab(self.Model, "")
         self.Optimizer = QtWidgets.QWidget()
         self.Optimizer.setObjectName("Optimizer")
         self.groupBox_9 = QtWidgets.QGroupBox(self.Optimizer)
-        self.groupBox_9.setGeometry(QtCore.QRect(400, 220, 351, 211))
+        self.groupBox_9.setGeometry(QtCore.QRect(400, 230, 351, 245))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.groupBox_9.setFont(font)
         self.groupBox_9.setObjectName("groupBox_9")
         self.tableWidget_2 = QtWidgets.QTableWidget(self.groupBox_9)
-        self.tableWidget_2.setGeometry(QtCore.QRect(10, 30, 331, 171))
+        self.tableWidget_2.setGeometry(QtCore.QRect(10, 30, 331, 192))
         self.tableWidget_2.setMinimumSize(QtCore.QSize(331, 0))
         self.tableWidget_2.setObjectName("tableWidget_2")
         self.tableWidget_2.setColumnCount(3)
@@ -209,7 +174,7 @@ class Ui_MainWindow(object):
         item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.tableWidget_2.setItem(4, 2, item)
         self.groupBox_10 = QtWidgets.QGroupBox(self.Optimizer)
-        self.groupBox_10.setGeometry(QtCore.QRect(400, 10, 351, 205))
+        self.groupBox_10.setGeometry(QtCore.QRect(400, 10, 342, 209))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.groupBox_10.setFont(font)
@@ -239,14 +204,12 @@ class Ui_MainWindow(object):
         self.label_9 = QtWidgets.QLabel(self.groupBox_10)
         self.label_9.setObjectName("label_9")
         self.gridLayout.addWidget(self.label_9, 2, 0, 1, 1)
-        self.comboBox_3 = QtWidgets.QComboBox(self.groupBox_10)
-        self.comboBox_3.setObjectName("comboBox_3")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.comboBox_3.addItem("")
-        self.gridLayout.addWidget(self.comboBox_3, 2, 1, 1, 2)
+        self.Pmax = QtWidgets.QSpinBox(self.groupBox_10)
+        self.Pmax.setMaximum(999999999)
+        self.Pmax.setSingleStep(50)
+        self.Pmax.setProperty("value", 300)
+        self.Pmax.setObjectName("Pmax")
+        self.gridLayout.addWidget(self.Pmax, 2, 1, 1, 2)
         self.label_10 = QtWidgets.QLabel(self.groupBox_10)
         font = QtGui.QFont()
         font.setPointSize(13)
@@ -271,7 +234,6 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.label_11, 4, 0, 1, 1)
         self.comboBox_4 = QtWidgets.QComboBox(self.groupBox_10)
         self.comboBox_4.setObjectName("comboBox_4")
-        self.comboBox_4.addItem("")
         self.comboBox_4.addItem("")
         self.comboBox_4.addItem("")
         self.comboBox_4.addItem("")
@@ -303,27 +265,27 @@ class Ui_MainWindow(object):
         self.textBrowser_2.setGeometry(QtCore.QRect(10, 30, 231, 391))
         self.textBrowser_2.setObjectName("textBrowser_2")
         self.pushButton_2 = QtWidgets.QPushButton(self.Output)
-        self.pushButton_2.setGeometry(QtCore.QRect(390, 340, 241, 71))
+        self.pushButton_2.setGeometry(QtCore.QRect(430, 400, 151, 41))
         font = QtGui.QFont()
-        font.setPointSize(18)
+        font.setPointSize(16)
         self.pushButton_2.setFont(font)
         self.pushButton_2.setObjectName("pushButton_2")
         self.groupBox_11 = QtWidgets.QGroupBox(self.Output)
-        self.groupBox_11.setGeometry(QtCore.QRect(280, 10, 471, 301))
+        self.groupBox_11.setGeometry(QtCore.QRect(270, 10, 481, 351))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.groupBox_11.setFont(font)
         self.groupBox_11.setObjectName("groupBox_11")
         self.tableWidget_3 = QtWidgets.QTableWidget(self.groupBox_11)
-        self.tableWidget_3.setGeometry(QtCore.QRect(10, 30, 451, 261))
+        self.tableWidget_3.setGeometry(QtCore.QRect(10, 30, 461, 311))
         self.tableWidget_3.setMinimumSize(QtCore.QSize(331, 0))
         font = QtGui.QFont()
         font.setPointSize(13)
         self.tableWidget_3.setFont(font)
         self.tableWidget_3.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableWidget_3.setObjectName("tableWidget_3")
-        self.tableWidget_3.setColumnCount(3)
-        self.tableWidget_3.setRowCount(8)
+        self.tableWidget_3.setColumnCount(4)
+        self.tableWidget_3.setRowCount(9)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget_3.setVerticalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -341,42 +303,40 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget_3.setVerticalHeaderItem(7, item)
         item = QtWidgets.QTableWidgetItem()
+        self.tableWidget_3.setVerticalHeaderItem(8, item)
+        item = QtWidgets.QTableWidgetItem()
         self.tableWidget_3.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget_3.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget_3.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
+        self.tableWidget_3.setHorizontalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
         self.tableWidget_3.setItem(0, 0, item)
         self.tableWidget_3.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget_3.horizontalHeader().setSortIndicatorShown(False)
         self.tableWidget_3.verticalHeader().setCascadingSectionResizes(True)
+        self.label_17 = QtWidgets.QLabel(self.Output)
+        self.label_17.setGeometry(QtCore.QRect(280, 350, 461, 51))
+        self.label_17.setTextFormat(QtCore.Qt.AutoText)
+        self.label_17.setScaledContents(False)
+        self.label_17.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.label_17.setWordWrap(True)
+        self.label_17.setObjectName("label_17")
         self.tabWidget.addTab(self.Output, "")
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 821, 36))
-        self.menubar.setObjectName("menubar")
-        self.menuFile = QtWidgets.QMenu(self.menubar)
-        self.menuFile.setObjectName("menuFile")
-        MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
-        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Tire Optimizer"))
-        self.label.setText(_translate("MainWindow", "Dm"))
-        self.label_2.setText(_translate("MainWindow", "Df"))
-        self.label_3.setText(_translate("MainWindow", "D"))
-        self.label_4.setText(_translate("MainWindow", "Wm"))
-        self.label_5.setText(_translate("MainWindow", "N"))
         self.groupBox.setTitle(_translate("MainWindow", "Design Variables"))
         self.label_12.setText(_translate("MainWindow", "Dm: mean tire diameter"))
         self.label_13.setText(_translate("MainWindow", "DF: outer wheel flange diameter"))
@@ -453,19 +413,13 @@ class Ui_MainWindow(object):
         self.groupBox_10.setTitle(_translate("MainWindow", "Optimization Parameter"))
         self.label_7.setText(_translate("MainWindow", "Loading Capacity [lbs]"))
         self.label_8.setText(_translate("MainWindow", "Speed Index [mph]"))
-        self.label_9.setText(_translate("MainWindow", "Cord Material"))
-        self.comboBox_3.setItemText(0, _translate("MainWindow", "Aramid (Kevlar 29)"))
-        self.comboBox_3.setItemText(1, _translate("MainWindow", "Cotton"))
-        self.comboBox_3.setItemText(2, _translate("MainWindow", "Polyester"))
-        self.comboBox_3.setItemText(3, _translate("MainWindow", "Rayon"))
-        self.comboBox_3.setItemText(4, _translate("MainWindow", "Polyamid Nylon"))
+        self.label_9.setText(_translate("MainWindow", "Max. Inflation Pressure [psi]"))
         self.label_10.setText(_translate("MainWindow", "Aspect Ratio (min, max)"))
         self.label_11.setText(_translate("MainWindow", "Tolerance"))
         self.comboBox_4.setCurrentText(_translate("MainWindow", "1e-4"))
-        self.comboBox_4.setItemText(0, _translate("MainWindow", "1e-3"))
-        self.comboBox_4.setItemText(1, _translate("MainWindow", "1e-4"))
-        self.comboBox_4.setItemText(2, _translate("MainWindow", "1e-5"))
-        self.comboBox_4.setItemText(3, _translate("MainWindow", "1e-6"))
+        self.comboBox_4.setItemText(0, _translate("MainWindow", "1e-4"))
+        self.comboBox_4.setItemText(1, _translate("MainWindow", "1e-5"))
+        self.comboBox_4.setItemText(2, _translate("MainWindow", "1e-6"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Optimizer Instruction"))
         self.textBrowser.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -486,33 +440,37 @@ class Ui_MainWindow(object):
         self.groupBox_11.setTitle(_translate("MainWindow", "Optimization Output"))
         self.tableWidget_3.setSortingEnabled(False)
         item = self.tableWidget_3.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Dm"))
+        item.setText(_translate("MainWindow", "Dm [in]"))
         item = self.tableWidget_3.verticalHeaderItem(1)
-        item.setText(_translate("MainWindow", "DF"))
+        item.setText(_translate("MainWindow", "DF [in]"))
         item = self.tableWidget_3.verticalHeaderItem(2)
-        item.setText(_translate("MainWindow", "D"))
+        item.setText(_translate("MainWindow", "D [in]"))
         item = self.tableWidget_3.verticalHeaderItem(3)
-        item.setText(_translate("MainWindow", "Wm"))
+        item.setText(_translate("MainWindow", "Wm [in]"))
         item = self.tableWidget_3.verticalHeaderItem(4)
         item.setText(_translate("MainWindow", "N"))
         item = self.tableWidget_3.verticalHeaderItem(5)
-        item.setText(_translate("MainWindow", "Loading Capacity [lbs]"))
+        item.setText(_translate("MainWindow", "Aspect Ratio"))
         item = self.tableWidget_3.verticalHeaderItem(6)
-        item.setText(_translate("MainWindow", "Inflation Pressure [psi]"))
+        item.setText(_translate("MainWindow", "Loading Capacity [lbs]"))
         item = self.tableWidget_3.verticalHeaderItem(7)
+        item.setText(_translate("MainWindow", "Inflation Pressure [psi]"))
+        item = self.tableWidget_3.verticalHeaderItem(8)
         item.setText(_translate("MainWindow", "Est. Tire Mass [kg]"))
         item = self.tableWidget_3.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Optimizer"))
         item = self.tableWidget_3.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Michelin"))
+        item.setText(_translate("MainWindow", "Standardized*"))
         item = self.tableWidget_3.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "Michelin"))
+        item = self.tableWidget_3.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Goodyear"))
         __sortingEnabled = self.tableWidget_3.isSortingEnabled()
         self.tableWidget_3.setSortingEnabled(False)
         self.tableWidget_3.setSortingEnabled(__sortingEnabled)
+        self.label_17.setText(_translate("MainWindow", "* Optimizer output dimensions standardized per TRA design guideline with performance recomputed. Satisfaction of requirements is NOT guaranteed."))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Output), _translate("MainWindow", "Output"))
-        self.menuFile.setTitle(_translate("MainWindow", "File"))
-    
+
     def show_warning(self, message): 
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Warning)
@@ -530,18 +488,62 @@ class Ui_MainWindow(object):
         msg.exec_()
     
     def run_optimization(self): 
-        def retrieve_tire_data(tire: Tire): 
+        def retrieve_tire_data(tire: Tire, source: str) -> Dict[str, float]: 
+            """Retrieve tire dimensions and performance data in 
+            dictionary for output. 
+            
+            Args: 
+                tire (Tire): a Tire object from models.py. 
+                source (str): the source of the tire from {'optimizer', 'michelin', 'goodyear'}
+            """
             output = {} 
             output['Dm'] = tire.Dm
             output['DF'] = tire.DF
             output['D'] = tire.D
             output['Wm'] = tire.Wm
             output['PR'] = tire.PR
-            output['Lm'] = tire.max_load_capacity()
-            output['IP'] = tire.inflation_pressure() 
-            output['Mass'] = tire.estimated_tire_mass()
+            output['AR'] = tire.aspect_ratio()
+            if source == "optimizer": 
+                output['Lm'] = tire.max_load_capacity(exact=True)
+                output['IP'] = tire.inflation_pressure() 
+                output['Mass'] = tire.estimated_tire_mass()
+            else: 
+                output['Lm'] = tire.Lm
+                if tire.IP: 
+                    output['IP'] = tire.IP 
+                else: 
+                    output['IP'] = tire.inflation_pressure() 
+                if source == "michelin": 
+                    output['Mass'] = tire.estimated_tire_mass() 
+                else: 
+                    output['Mass'] = tire.mass
             return output 
             
+        def standardize_tire(tire_data: Dict[str, float]) -> Dict[str, float]: 
+            """Standardize all dimensions of the tire generated by the optimizer, 
+            and recompute all tire performance. 
+
+            Args:
+                tire_data (Dict[str, float]): output from retrieve_tire_data. 
+            """
+            output = {} 
+            output['Dm'] = round(tire_data['Dm'] * 2) / 2 
+            if tire_data['Wm'] < 10: 
+                output['Wm'] = round(tire_data['Wm'] * 4) / 4 
+            else: 
+                output['Wm'] = round(tire_data['Wm'] * 2) / 2
+            output['D'] = round(tire_data['D'])
+            output['DF'] = round(tire_data['Wm'] * 8) / 8 
+            output['PR'] = round(tire_data['PR'])
+            
+            tire = Tire(Dm=output['Dm'], Wm=output['Wm'], D=output['D'], DF=output['DF'], PR=output['PR'])
+            output['AR'] = tire.aspect_ratio()
+            output['Lm'] = tire.max_load_capacity()
+            output['IP'] = tire.inflation_pressure() 
+            output['Mass'] = tire.estimated_tire_mass() 
+            return output
+
+        
         # Receive user inputs 
         self.scopes = {}
         for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR']): 
@@ -553,21 +555,8 @@ class Ui_MainWindow(object):
         
         self.Lm_req = float(self.LmReq.text())
         self.I_speed = float(self.SiReq.text()) 
+        self.max_pressure = float(self.Pmax.text())
         self.tolerance = float(self.comboBox_4.itemText(self.comboBox_4.currentIndex()))
-        
-        self.cord_brake_load = 0 
-        self.cord_material = self.comboBox_3.currentIndex()
-        if self.cord_material == 0: # Aramid (Kevlar 29)
-            self.cord_brake_load = 338.0 
-        elif self.cord_material == 1: # Cotton 
-            self.cord_brake_load == 42.0 
-        elif self.cord_material == 2: # Polyester
-            self.cord_brake_load == 228.0 
-        elif self.cord_material == 3: # Rayon
-            self.cord_brake_load == 115.0 
-        elif self.cord_material == 4: # Polyamid Nylon  
-            self.cord_brake_load == 175.0 
-        self.cord_material = self.comboBox_3.itemText(self.cord_material) # store material name 
         
         self.aspect_ratio = [
             float(self.doubleSpinBox.text()), float(self.doubleSpinBox_2.text())
@@ -579,10 +568,10 @@ class Ui_MainWindow(object):
         # Run optimizer 
         st = time.time() 
         self.opt_tire = optimizer.gradients_opt(
-            self.Lm_req * 1.07, self.I_speed, self.cord_brake_load, self.scopes, self.aspect_ratio, self.tolerance
+            self.Lm_req * 1.07, self.I_speed, self.max_pressure, self.scopes, self.aspect_ratio, self.tolerance
         )
-        self.michelin_tire = optimizer.search_databook(self.Lm_req * 1.07, self.I_speed, source='michelin')
-        self.goodyear_tire = optimizer.search_databook(self.Lm_req * 1.07, self.I_speed, source='goodyear')
+        self.michelin_tire = optimizer.search_databook(self.Lm_req * 1.07, speed_index_des=self.I_speed, max_pressure=self.max_pressure, source='michelin')
+        self.goodyear_tire = optimizer.search_databook(self.Lm_req * 1.07, speed_index_des=self.I_speed, max_pressure=self.max_pressure, source='goodyear')
         self.time_elapsed = time.time() - st
         self.time_complete = datetime.datetime.now()
         
@@ -594,9 +583,8 @@ class Ui_MainWindow(object):
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><strong>Optimization input:</strong></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Loading capacity [lbs]: {self.Lm_req}</p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Speed index [mph]: {self.I_speed}</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Cord material: {self.cord_material}</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Cord brake strength [N]: {self.cord_brake_load}</p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Tolerance: {self.tolerance}</p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Max. inflation pressure [psi]: {self.max_pressure}</p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Tolerance for termination: {self.tolerance}</p>
 <br /><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><strong>Optimization scope:</strong></p>
         """
         for var in ['Dm', 'DF', 'D', 'Wm', 'PR']: 
@@ -615,40 +603,45 @@ class Ui_MainWindow(object):
         
         # Print output 
         if self.opt_tire: 
-            output = retrieve_tire_data(self.opt_tire)
-            for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "Lm", "IP", "Mass"]): 
+            output = retrieve_tire_data(self.opt_tire, 'optimizer')
+            standardized_output = standardize_tire(output)
+            for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "AR", "Lm", "IP", "Mass"]): 
                 item = QtWidgets.QTableWidgetItem()
-                item.setText(str(round(output[var], 2)))
+                item.setText(str(round(output[var], 3)))
                 self.tableWidget_3.setItem(i, 0, item)
+                item = QtWidgets.QTableWidgetItem()
+                item.setText(str(round(standardized_output[var], 3)))
+                self.tableWidget_3.setItem(i, 1, item)
         else: 
-            for i in range(8):
+            for i in range(9):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText("N/A")
                 self.tableWidget_3.setItem(i, 0, item)
+                self.tableWidget_3.setItem(i, 1, item)
                 
         if self.michelin_tire: 
-            output = retrieve_tire_data(self.michelin_tire)
-            for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "Lm", "IP", "Mass"]): 
+            output = retrieve_tire_data(self.michelin_tire, 'michelin')
+            for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "AR", "Lm", "IP", "Mass"]): 
                 item = QtWidgets.QTableWidgetItem()
-                item.setText(str(round(output[var], 2)))
-                self.tableWidget_3.setItem(i, 1, item)
+                item.setText(str(round(output[var], 3)))
+                self.tableWidget_3.setItem(i, 2, item)
         else: 
-            for i in range(8):
+            for i in range(9):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText("N/A")
-                self.tableWidget_3.setItem(i, 1, item)
+                self.tableWidget_3.setItem(i, 2, item)
         
         if self.goodyear_tire: 
-            output = retrieve_tire_data(self.goodyear_tire)
-            for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "Lm", "IP", "Mass"]): 
+            output = retrieve_tire_data(self.goodyear_tire, 'goodyear')
+            for i, var in enumerate(['Dm', 'DF', 'D', 'Wm', 'PR', "AR", "Lm", "IP", "Mass"]): 
                 item = QtWidgets.QTableWidgetItem()
-                item.setText(str(round(output[var], 2)))
-                self.tableWidget_3.setItem(i, 2, item)
+                item.setText(str(round(output[var], 3)))
+                self.tableWidget_3.setItem(i, 3, item)
         else: 
-            for i in range(8):
+            for i in range(9):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText("N/A")
-                self.tableWidget_3.setItem(i, 2, item)
+                self.tableWidget_3.setItem(i, 3, item)
 
         # Redirect to Output page
         self.tabWidget.setCurrentIndex(2)
@@ -671,9 +664,8 @@ class Ui_MainWindow(object):
             csv_writer.writerow(['Optimization inputs'])
             csv_writer.writerow(["Loading capacity", self.Lm_req, "lbs"])
             csv_writer.writerow(["Speed index", self.I_speed, "mph"])
-            csv_writer.writerow(["Cord material", self.cord_material])
-            csv_writer.writerow(["Cord brake strength", self.cord_brake_load, "N"])
-            csv_writer.writerow(["Tolerance of termination", self.tolerance])
+            csv_writer.writerow(["Max. inflation pressure", self.max_pressure, "psi"])
+            csv_writer.writerow(["Tolerance for termination", self.tolerance])
             csv_writer.writerow([])
             
             csv_writer.writerow(['Optimization scope'])
@@ -686,12 +678,14 @@ class Ui_MainWindow(object):
             csv_writer.writerow([])
             
             csv_writer.writerow(['Optimization results'])
-            csv_writer.writerow(['', 'Optimizer', 'Michelin', 'Goodyear'])
-            for i in range(8): 
+            csv_writer.writerow(['', 'Optimizer', 'Standardized*', 'Michelin', 'Goodyear'])
+            for i in range(9): 
                 row = [self.tableWidget_3.verticalHeaderItem(i).text()] 
-                for j in range(3): 
+                for j in range(4): 
                     row.append(self.tableWidget_3.item(i, j).text())
                 csv_writer.writerow(row)
+                
+            csv_writer.writerow(['', '*Optimizer output dimensions standardized per TRA design guideline with performance recomputed. Satisfaction of requirements is NOT guaranteed.'])
 
         self.show_complete("CSV exported successfully!")
                 

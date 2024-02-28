@@ -21,13 +21,14 @@ import openmdao.api as om
 from models import Tire
 
 
-def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Optional[Tire]:
+def search_databook(Lm_des: float, speed_index_des=0.0, max_pressure=float('inf'), source='michelin') -> Optional[Tire]:
     """Given the desired loading capacity, find the corresponding tire specifications 
     from the Michelin Tire Databook. 
 
     Args:
         Lm_des (float): required tire loading capability in lbs. 
         speed_index_des (float, optional): designed speed rating for the aircraft in mph. Defaults to 0.0.
+        max_pressure (float, optional): maximum pressure that the tire can be inflated to. Defaults to inf. 
         source (str, optional): source of manufacturer databook from {'michelin', 'goodyear'}. 
             Defaults to 'michelin'. 
 
@@ -55,18 +56,21 @@ def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Op
                 if (
                     (manu_dim[5] and manu_dim[9]) and # required design parameters present 
                     manu_dim[5] >= Lm_des and # check if Lm meet requirement 
-                    (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) # check if speed index meet requirement (if any)
+                    (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) and # check if speed index meet requirement (if any)
+                    manu_dim[7] <= max_pressure # check if inflation pressure exceeds maximum 
                 ):
                     tire = Tire(
                         D=manu_dim[2], PR=manu_dim[3], SI=manu_dim[4], Lm=manu_dim[5], 
                         DoMax=manu_dim[8], DoMin=manu_dim[9], WMax=manu_dim[10], 
-                        WMin=manu_dim[11], RD=manu_dim[18], FH=manu_dim[19], DF=manu_dim[21]
+                        WMin=manu_dim[11], RD=manu_dim[18], FH=manu_dim[19], DF=manu_dim[21], 
+                        IP=manu_dim[7] 
                     )
-                    curr_mass = tire.inflation_medium_mass()
-                    # Check if better than current best 
-                    if curr_mass < lowest_mass: 
-                        lowest_mass = curr_mass 
-                        best_tire = copy.deepcopy(tire) 
+                    if tire.IP or tire.inflation_pressure() <= max_pressure: # account for tires with inflation pressure missing 
+                        curr_mass = tire.inflation_medium_mass()
+                        # Check if better than current best 
+                        if curr_mass < lowest_mass: 
+                            lowest_mass = curr_mass 
+                            best_tire = copy.deepcopy(tire) 
     elif source == 'goodyear': 
         with open("manufacturer_data/goodyear_bias.csv") as data_csv: 
             csv_reader = csv.reader(data_csv)
@@ -89,18 +93,21 @@ def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Op
                 if (
                     (manu_dim[5] and manu_dim[12]) and # required design parameters present 
                     manu_dim[5] >= Lm_des and # check if Lm meet requirement 
-                    (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) # check if speed index meet requirement (if any)
+                    (not speed_index_des or not manu_dim[4] or manu_dim[4] >= speed_index_des) and # check if speed index meet requirement (if any)
+                    manu_dim[6] <= max_pressure # check if inflation pressure exceeds maximum 
                 ):
                     tire = Tire(
                         D=manu_dim[23], PR=manu_dim[2], SI=manu_dim[4], Lm=manu_dim[5], 
                         DoMax=manu_dim[12], DoMin=manu_dim[13], WMax=manu_dim[14], 
-                        WMin=manu_dim[15], RD=manu_dim[23], FH=manu_dim[24]
+                        WMin=manu_dim[15], RD=manu_dim[23], FH=manu_dim[24], 
+                        IP=manu_dim[6], WGT=manu_dim[11]
                     )
-                    curr_mass = tire.inflation_medium_mass()
-                    # Check if better than current best 
-                    if curr_mass < lowest_mass: 
-                        lowest_mass = curr_mass 
-                        best_tire = copy.deepcopy(tire) 
+                    if tire.IP or tire.inflation_pressure() <= max_pressure: # account for tires with inflation pressure missing 
+                        curr_mass = tire.inflation_medium_mass()
+                        # Check if better than current best 
+                        if curr_mass < lowest_mass: 
+                            lowest_mass = curr_mass 
+                            best_tire = copy.deepcopy(tire) 
     else: 
         raise ValueError("Unsupported source, please choose from {'michelin', 'goodyear'}.") 
     
@@ -108,9 +115,8 @@ def search_databook(Lm_des: float, speed_index_des=0.0, source='michelin') -> Op
 
 
 def _gradients_opt(
-    req_Lm: float, speed_index: float, cord_break_load: float, 
-    scopes: Dict[str, Tuple[float, float, float]], 
-    aspect_ratio: Tuple[float, float], tol
+    req_Lm: float, speed_index: float, max_inflation_pressure: float, cord_break_load: float, 
+    scopes: Dict[str, Tuple[float, float, float]], aspect_ratio: Tuple[float, float], tol
 ) -> Optional[Tire]: 
     """Use the openMDAO framework to perform gradients-based optimization to search 
     for an optimized aircraft tire design given scopes and solver types. 
@@ -118,6 +124,8 @@ def _gradients_opt(
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
+        max_inflation_pressure (float, optional): maximum pressure that the 
+            tire can be inflated to in psi. 
         cord_break_load (float): cord material designed breaking load in N. 
         scopes (Dict[str, Tuple[float, float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[lower_bound, upper_bound, initial_guess]]
@@ -158,6 +166,31 @@ def _gradients_opt(
             
             tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF, SI=speed_index)
             outputs['Lm'] = tire.max_load_capacity(exact=True)
+            
+    class InflationPressure(om.ExplicitComponent): 
+        """The explicit MDA component that defines the discipline 
+        (correlation of all optimizing variables) for optimization. 
+        """
+        def setup(self): 
+            self.add_input('Dm', val=init_val['Dm'])
+            self.add_input('Wm', val=init_val['Wm'])
+            self.add_input('D', val=init_val['D'])
+            self.add_input('DF', val=init_val['DF'])
+            self.add_input('PR', val=init_val['PR'])
+            self.add_output('IP')
+        
+        def setup_partials(self):
+            self.declare_partials('*', '*', method='fd')
+        
+        def compute(self, inputs, outputs):
+            Dm = inputs['Dm']
+            Wm = inputs['Wm']
+            D = inputs['D']
+            DF = inputs['DF']
+            PR = inputs['PR']
+            
+            tire = Tire(PR=PR, Dm=Dm, Wm=Wm, RD=D, DF=DF, SI=speed_index)
+            outputs['IP'] = tire.inflation_pressure()
 
     class GasMass(om.ExplicitComponent): 
         """The explicit MDA component that defines the objective 
@@ -217,7 +250,8 @@ def _gradients_opt(
         def setup(self):
             cycle = self.add_subsystem('cycle', om.Group())
             cycle.add_subsystem('d', LoadCapacity())
-            cycle.add_subsystem('e', MechFeasibility())
+            cycle.add_subsystem('e', InflationPressure())
+            cycle.add_subsystem('f', MechFeasibility())
             
             self.add_subsystem('obj_cmp', GasMass())
             
@@ -236,10 +270,14 @@ def _gradients_opt(
                     Dm=init_val['Dm'], D=init_val['D'], Wm=init_val['Wm']
                 )
             ) # aspect ratio 
+            self.add_subsystem(
+                'con_cmp5', om.ExecComp('con5 = IP')
+            )
             
         def configure(self):
             self.cycle.promotes('d', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['Lm'])
-            self.cycle.promotes('e', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['fiber_tension'])
+            self.cycle.promotes('e', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['IP'])
+            self.cycle.promotes('f', inputs=['Dm', 'Wm', 'D', 'DF', 'PR'], outputs=['fiber_tension'])
             self.promotes('cycle', any=['*'])
             
             self.promotes('obj_cmp', any=['Dm', 'Wm', 'D', 'DF', 'PR', 'mass'])
@@ -247,6 +285,7 @@ def _gradients_opt(
             self.promotes('con_cmp2', any=['con2', 'Dm', 'DF'])
             self.promotes('con_cmp3', any=['con3', 'DF', 'D'])
             self.promotes('con_cmp4', any=['con4', 'Dm', 'D', 'Wm'])
+            self.promotes('con_cmp5', any=['con5', 'IP'])
             
             self.add_design_var('Dm', lower=scopes['Dm'][0], upper=scopes['Dm'][1])
             self.add_design_var('Wm', lower=scopes['Wm'][0], upper=scopes['Wm'][1])
@@ -259,6 +298,7 @@ def _gradients_opt(
             self.add_constraint('con2', lower=0.0001)
             self.add_constraint('con3', lower=0.0001)
             self.add_constraint('con4', lower=aspect_ratio[0], upper=aspect_ratio[1]) # TRA standard
+            self.add_constraint('con5', upper=max_inflation_pressure)
     
     prob = om.Problem(reports=False) 
     prob.model = TireMDA()
@@ -288,7 +328,7 @@ def _gradients_opt(
     return tire 
 
 def gradients_opt(
-    req_Lm: float, speed_index: float, cord_break_load: float, 
+    req_Lm: float, speed_index: float, max_inflation_pressure: float, 
     scopes: Dict[str, Tuple[float, float]], 
     aspect_ratio: Tuple[float, float], tol
 ) -> Tire: 
@@ -298,7 +338,8 @@ def gradients_opt(
     Args:
         req_Lm (float): the minimum required load capacity 
         speed_index (float): the speed index of the target aircraft design 
-        cord_break_load (float, optional): cord material designed breaking load in N. 
+        max_inflation_pressure (float, optional): maximum pressure that the 
+            tire can be inflated to in psi. 
         scopes (Dict[str, Tuple[float, float]]): the domain of all design variables 
             Dict[name_of_variable, Tuple[min_value, max_value, initial_guess]]
         aspect_ratio (Tuple[float, float]): min and max aspect ratio 
@@ -311,7 +352,7 @@ def gradients_opt(
     counter = 0 
     while not tire: 
         counter += 1
-        tire = _gradients_opt(req_Lm, speed_index, cord_break_load, scopes, aspect_ratio, tol)
+        tire = _gradients_opt(req_Lm, speed_index, max_inflation_pressure, 338.0, scopes, aspect_ratio, tol)
         req_Lm += 1
         if counter == 10: 
             break 

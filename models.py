@@ -53,6 +53,9 @@ class Tire:
         # Qualification Standard
         self.QS: str = kwargs.get('QS', '')
         
+        # Tire Mass (for Goodyear only)
+        self.mass: float = kwargs.get('WGT', 0)
+        
         # Check for missing values 
         if not self.D:
             self.D = self.RD
