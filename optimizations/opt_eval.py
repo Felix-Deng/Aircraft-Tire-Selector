@@ -68,16 +68,16 @@ plt.rcParams.update({
 s = 200 # marker size 
 
 _, ax = plt.subplots(figsize=(16, 10))
-ax.scatter(Lm_michelin, perf_michelin, marker='o', s=s, label='Michelin')
-ax.scatter(Lm_goodyear, perf_goodyear, marker='^', s=s, label='Goodyear')
-ax.scatter(Lm_gradients, perf_gradients, marker='x', s=s, label='Developed Framework')
+ax.scatter(Lm_michelin, perf_michelin, marker='o', s=s, label='Michelin', color='grey')
+ax.scatter(Lm_goodyear, perf_goodyear, marker='^', s=s, label='Goodyear', color='grey')
+ax.scatter(Lm_gradients, perf_gradients, marker='x', s=s, label='Developed Framework', color='red')
 
 x = np.array([Lm_michelin[0], Lm_michelin[-1]]) 
-ax.plot(x, michelin_m * x + michelin_b, ls='--')
+ax.plot(x, michelin_m * x + michelin_b, ls='--', color='grey', lw=3)
 x = np.array([Lm_goodyear[0], Lm_goodyear[-1]]) 
-ax.plot(x, goodyear_m * x + good_year_b, ls='--')
+ax.plot(x, goodyear_m * x + good_year_b, ls='--', color='grey', lw=3)
 x = np.array([Lm_gradients[0], Lm_gradients[-1]]) 
-ax.plot(x, gradients_m * x + gradients_b, ls='--')
+ax.plot(x, gradients_m * x + gradients_b, ls='--', color='red', lw=3)
 
 ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 ax.set_xlabel("Desired Loading Capability [lbs]")
