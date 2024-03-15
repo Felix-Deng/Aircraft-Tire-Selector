@@ -791,6 +791,8 @@ class Ui_MainWindow(object):
                 item = QtWidgets.QTableWidgetItem()
                 item.setText("N/A")
                 self.tableWidget_3.setItem(i, 0, item)
+                item = QtWidgets.QTableWidgetItem()
+                item.setText("N/A")
                 self.tableWidget_3.setItem(i, 1, item)
                 
         if self.michelin_tire: 
