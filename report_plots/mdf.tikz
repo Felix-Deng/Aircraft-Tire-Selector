@@ -59,7 +59,7 @@
 \\
 %Row 5
 &
-\node [DataInter] (mech-opt) {$\sigma_{cord}$};&
+\node [DataInter] (mech-opt) {$T_{cord}$};&
 &
 &
 &

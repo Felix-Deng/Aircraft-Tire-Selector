@@ -15,7 +15,7 @@ x.connect("solver", "mech", "x")
 
 x.connect("load", "opt", "L_m")
 x.connect("mass", "opt", "m_{tire}")
-x.connect("mech", "opt", "\sigma_{cord}")
+x.connect("mech", "opt", "T_{cord}")
 x.connect("load", "mech", "P_{inflation}")
 
 x.add_input("opt", "x^{(0)}")
