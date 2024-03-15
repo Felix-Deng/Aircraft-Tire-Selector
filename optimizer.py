@@ -294,9 +294,9 @@ def _gradients_opt(
             self.add_design_var('PR', lower=scopes['PR'][0], upper=scopes['PR'][1])
             
             self.add_objective("mass")
-            self.add_constraint('con1', lower=0.0001)
-            self.add_constraint('con2', lower=0.0001)
-            self.add_constraint('con3', lower=0.0001)
+            self.add_constraint('con1', lower=0.5)
+            self.add_constraint('con2', lower=0.5)
+            self.add_constraint('con3', lower=0.5)
             self.add_constraint('con4', lower=aspect_ratio[0], upper=aspect_ratio[1]) # TRA standard
             self.add_constraint('con5', upper=max_inflation_pressure)
     
