@@ -296,7 +296,7 @@ def _gradients_opt(
             self.add_objective("mass")
             self.add_constraint('con1', lower=0.5)
             self.add_constraint('con2', lower=0.5)
-            self.add_constraint('con3', lower=0.5)
+            self.add_constraint('con3', lower=0.625) # minimum flange height from Michelin 
             self.add_constraint('con4', lower=aspect_ratio[0], upper=aspect_ratio[1]) # TRA standard
             self.add_constraint('con5', upper=max_inflation_pressure)
     
