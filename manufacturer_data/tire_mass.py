@@ -1,5 +1,7 @@
 import csv 
 import numpy as np 
+import pandas as pd 
+import seaborn as sns 
 from scipy import constants, stats 
 import matplotlib.pyplot as plt 
 from _models import Tire 
@@ -42,20 +44,17 @@ with open("manufacturer_data/goodyear_bias.csv") as data_csv:
 print(np.mean([model_Lm[i] - item for i, item in enumerate(manu_Lm)]))
 print(np.mean([model_IP[i] - item for i, item in enumerate(manu_IP)])) 
 
-lin_res = stats.linregress(tire_weight, gas_weight)
 
-_, ax = plt.subplots()
-ax.scatter(tire_weight, gas_weight)
-ax.plot(
-    [0, ax.get_xlim()[1]], 
-    [lin_res.intercept, ax.get_xlim()[1] * lin_res.slope], 
-    color='red', label=r'$R^2 = {}$'.format(round(lin_res.rvalue**2, 3))
-)
-ax.legend() 
-ax.set_xlabel("Overall Mass of Tire [kg]")
-ax.set_ylabel("Mass of Tire Inflation Medium [kg]")
+df = pd.DataFrame({
+    "tire": tire_weight, 
+    "gas": gas_weight
+})
 
+sns.regplot(data=df, x='tire', y='gas', ci=90, color='red')
+plt.xlabel("Overall Mass of Tire [kg]")
+plt.ylabel("Mass of Tire Inflation Medium [kg]")
 plt.tight_layout() 
 plt.show() 
 
+lin_res = stats.linregress(tire_weight, gas_weight)
 print(stats.linregress(gas_weight, tire_weight))

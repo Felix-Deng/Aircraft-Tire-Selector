@@ -89,6 +89,8 @@ plt.show()
 # Plotting computational time 
 _, ax = plt.subplots()
 ax.scatter(Lm_gradients, time_gradients, marker='x')
+ax.hlines(max(time_gradients), xmin=ax.get_xlim()[0], xmax=ax.get_xlim()[1], ls='--', color='black')
+ax.text(0, max(time_gradients)+0.001, str(round(max(time_gradients), 4)))
 ax.ticklabel_format(style='sci', axis='x', scilimits=(0,0))
 ax.set_xlabel("Desired Loading Capability [lbs]")
 ax.set_ylabel("Expected Computation Time [sec]")
