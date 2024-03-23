@@ -5,10 +5,9 @@ This program automatically processes key aircraft design requirements (load inpu
 1. Download and clone the repository as you would do for any other GitHub project. 
 2. In the terminal, navigate to the local directory of the project. 
 3. Run the main file with `python main.py` for Windows or `python3 main.py` for MacOS. 
-    - If the program fails to run due to missing Python libraries, please follow the [development guide](#development-guide) below to set up a local virtual environment. 
 4. Follow instructions on the launched user interface to perform tire design optimizations. 
 
-The project was created with Python 3.8. If errors are encountered when launching the main file, please follow instructions for [first time setup](#first-time-setup) to set up a local virtual environment and download the required Python packages. 
+The project was created with Python 3.8. If errors are encountered when launching the main file, please follow instructions for [development guide](#development-guide) to set up a local virtual environment and download the required Python packages. 
 
 ## Repository structure 
 ```
