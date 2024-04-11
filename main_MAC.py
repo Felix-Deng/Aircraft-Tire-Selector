@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'QT_Designer_WIN.ui'
+# Form implementation generated from reading ui file 'QT_Designer_MAC.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #
@@ -122,13 +122,13 @@ class Ui_MainWindow(object):
         self.Optimizer = QtWidgets.QWidget()
         self.Optimizer.setObjectName("Optimizer")
         self.groupBox_9 = QtWidgets.QGroupBox(self.Optimizer)
-        self.groupBox_9.setGeometry(QtCore.QRect(370, 230, 410, 240))
+        self.groupBox_9.setGeometry(QtCore.QRect(370, 230, 410, 233))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.groupBox_9.setFont(font)
         self.groupBox_9.setObjectName("groupBox_9")
         self.tableWidget_2 = QtWidgets.QTableWidget(self.groupBox_9)
-        self.tableWidget_2.setGeometry(QtCore.QRect(20, 30, 361, 203))
+        self.tableWidget_2.setGeometry(QtCore.QRect(20, 30, 361, 190))
         self.tableWidget_2.setMinimumSize(QtCore.QSize(331, 0))
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -420,13 +420,13 @@ class Ui_MainWindow(object):
         self.pushButton_2.setFont(font)
         self.pushButton_2.setObjectName("pushButton_2")
         self.groupBox_11 = QtWidgets.QGroupBox(self.Output)
-        self.groupBox_11.setGeometry(QtCore.QRect(270, 10, 521, 361))
+        self.groupBox_11.setGeometry(QtCore.QRect(270, 10, 521, 351))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.groupBox_11.setFont(font)
         self.groupBox_11.setObjectName("groupBox_11")
         self.tableWidget_3 = QtWidgets.QTableWidget(self.groupBox_11)
-        self.tableWidget_3.setGeometry(QtCore.QRect(10, 30, 501, 331))
+        self.tableWidget_3.setGeometry(QtCore.QRect(10, 30, 501, 311))
         self.tableWidget_3.setMinimumSize(QtCore.QSize(331, 0))
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -467,7 +467,7 @@ class Ui_MainWindow(object):
         self.tableWidget_3.horizontalHeader().setSortIndicatorShown(False)
         self.tableWidget_3.verticalHeader().setCascadingSectionResizes(True)
         self.label_17 = QtWidgets.QLabel(self.Output)
-        self.label_17.setGeometry(QtCore.QRect(280, 370, 501, 41))
+        self.label_17.setGeometry(QtCore.QRect(280, 360, 501, 41))
         self.label_17.setTextFormat(QtCore.Qt.AutoText)
         self.label_17.setScaledContents(False)
         self.label_17.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
@@ -505,18 +505,18 @@ class Ui_MainWindow(object):
         self.textBrowser_model_2.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'.AppleSystemUIFont\'; font-size:10pt;\">Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'.AppleSystemUIFont\'; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'.AppleSystemUIFont\'; font-size:10pt;\">The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'.AppleSystemUIFont\'; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'.AppleSystemUIFont\'; font-size:10pt;\">THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span></p></body></html>"))
+"</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span></p></body></html>"))
         self.groupBox_12.setTitle(_translate("MainWindow", "Background"))
         self.textBrowser_model.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This program is built to assist aircraft landing gear designers to explore optimized (lightest in weight) and mechanically feasible aircraft tires through advanced optimization algorithms. </p></body></html>"))
+"</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">This program is built to assist aircraft landing gear designers to explore optimized (lightest in weight) and mechanically feasible aircraft tires through advanced optimization algorithms. </span></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Model), _translate("MainWindow", "Model"))
         self.groupBox_9.setTitle(_translate("MainWindow", "Optimization Scope"))
         item = self.tableWidget_2.verticalHeaderItem(0)
@@ -560,12 +560,12 @@ class Ui_MainWindow(object):
         self.textBrowser.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">1. Select a unit system in &quot;Optimization Parameter&quot; section. </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">2. Enter optimization requirements in the selected units. </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">3. Modified the lower and upper bounds of the variables, if needed. All dimensions (except N) are in the unit of inches.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">Note: changing the optimization scope may result in failure of optimization. </span></p></body></html>"))
+"</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:14pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:12pt;\">1. Select a unit system in &quot;Optimization Parameter&quot; section. </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:12pt;\">2. Enter optimization requirements in the selected units. </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:12pt;\">3. Modified the lower and upper bounds of the variables, if needed. </span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:12pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:12pt;\">Note: changing the optimization scope may result in failure of optimization. </span></p></body></html>"))
         self.pushButton.setText(_translate("MainWindow", "Run Optimizer"))
         self.pushButton.clicked.connect(self.run_optimization)
         self.groupBox_14.setTitle(_translate("MainWindow", "Optimization Parameter"))
@@ -595,8 +595,8 @@ class Ui_MainWindow(object):
         self.textBrowser_2.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'.AppleSystemUIFont\'; font-size:12pt;\">Please first run the optimizer in the &quot;Optimizer&quot; page. </span></p></body></html>"))
+"</style></head><body style=\" font-family:\'.AppleSystemUIFont\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">Please first run the optimizer in the &quot;Optimizer&quot; page. </span></p></body></html>"))
         self.pushButton_2.setText(_translate("MainWindow", "Save to CSV"))
         self.pushButton_2.clicked.connect(self.save_csv)
         self.groupBox_11.setTitle(_translate("MainWindow", "Optimization Output"))
@@ -633,7 +633,7 @@ class Ui_MainWindow(object):
         self.label_17.setText(_translate("MainWindow", "* Optimizer output dimensions standardized per TRA design guideline with performance recomputed. Satisfaction of requirements are not guaranteed."))
         self.label_28.setText(_translate("MainWindow", "** Lightest tires chosen from published manufacturer databook with requirements satisfied. "))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Output), _translate("MainWindow", "Output"))
-        
+
     def show_warning(self, message): 
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Warning)
